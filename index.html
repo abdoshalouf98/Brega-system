@@ -5,59 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دخول - شركة البريقة</title>
     <style>
-        :root { --primary: #004a99; --secondary: #002d5d; --bg: #f0f2f5; }
+        :root { --p: #004a99; --s: #002d5d; --bg: #f8fafc; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; direction: rtl; }
-        .login-card { background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
-        .logo { width: 110px; margin-bottom: 10px; }
-        h2 { color: var(--secondary); margin-bottom: 25px; font-size: 1.3rem; }
-        .input-group { text-align: right; margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 0.9rem; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; outline: none; transition: 0.3s; background: #fafafa; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,74,153,0.1); }
-        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: var(--secondary); transform: translateY(-2px); }
-        .error-msg { color: #dc3545; font-size: 0.85rem; margin-top: 10px; display: none; }
-        .register-link { margin-top: 20px; font-size: 0.85rem; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
-        .register-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; }
-        .modal-content { background: white; width: 85%; max-width: 350px; margin: 15vh auto; padding: 25px; border-radius: 20px; position: relative; text-align: center; }
-        #strength-meter { height: 4px; background: #eee; margin-top: 5px; border-radius: 2px; overflow: hidden; }
-        #strength-bar { height: 100%; width: 0; transition: 0.3s; }
+        .card { background: white; padding: 40px 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .logo { width: 120px; margin-bottom: 20px; }
+        h2 { color: var(--s); margin: 0 0 30px 0; font-size: 1.5rem; }
+        .group { text-align: right; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #64748b; font-size: 0.9rem; }
+        input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; box-sizing: border-box; outline: none; transition: 0.3s; background: #f8fafc; font-size: 1rem; }
+        input:focus { border-color: var(--p); background: white; box-shadow: 0 0 0 4px rgba(0,74,153,0.1); }
+        button { width: 100%; padding: 16px; background: var(--p); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: var(--s); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,74,153,0.2); }
+        .error { color: #ef4444; font-size: 0.85rem; margin-top: 15px; display: none; background: #fee2e2; padding: 10px; border-radius: 8px; }
+        .reg { margin-top: 25px; font-size: 0.9rem; color: #94a3b8; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+        .reg a { color: var(--p); text-decoration: none; font-weight: bold; }
+        
+        /* Modal Style */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
+        .m-content { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 24px; position: relative; }
+        #s-bar { height: 4px; background: #e2e8f0; margin-top: 8px; border-radius: 2px; overflow: hidden; }
+        #s-fill { height: 100%; width: 0; transition: 0.5s; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <img src="Logo.png" alt="Logo" class="logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png'">
-        <h2>منظومة تتبع الخزانات</h2>
-        <div class="input-group"><label>الرقم الوظيفي</label><input type="text" id="username" placeholder="أدخل الرقم"></div>
-        <div class="input-group"><label>كلمة السر</label><input type="password" id="password" placeholder="أدخل كلمة السر"></div>
+    <div class="card">
+        <img src="Logo.png" class="logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png'">
+        <h2>تتبع الخزانات الذكي</h2>
+        
+        <div class="group">
+            <label>الرقم الوظيفي</label>
+            <input type="text" id="username" placeholder="الرقم الوظيفي">
+        </div>
+        
+        <div class="group">
+            <label>كلمة السر</label>
+            <input type="password" id="password" placeholder="كلمة السر">
+        </div>
+        
         <button onclick="login()">تسجيل الدخول</button>
-        <p id="errorMessage" class="error-msg"></p>
-        <div class="register-link">ليس لديك حساب؟ <a href="#" onclick="document.getElementById('registerModal').style.display='block'">طلب تسجيل جديد</a></div>
+        <div id="errorMessage" class="error"></div>
+        
+        <div class="reg">لا تملك صلاحية؟ <a href="#" onclick="openModal()">طلب حساب</a></div>
     </div>
 
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <span style="float:left; cursor:pointer;" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
-            <h3 style="color:var(--primary)">طلب حساب جديد</h3>
-            <input type="text" id="newUsername" placeholder="الرقم الوظيفي" style="margin-bottom:10px">
-            <input type="password" id="newPassword" placeholder="كلمة السر" oninput="checkStrength(this.value)">
-            <div id="strength-meter"><div id="strength-bar"></div></div>
-            <button style="background:#28a745; margin-top:15px" onclick="sendEmail()">إرسال للإدارة</button>
+    <div id="regModal" class="modal">
+        <div class="m-content">
+            <h3 style="margin-top:0; color:var(--s)">طلب تسجيل جديد</h3>
+            <div class="group">
+                <label>الرقم الوظيفي</label>
+                <input type="text" id="newU" placeholder="أدخل رقمك الوظيفي">
+            </div>
+            <div class="group">
+                <label>كلمة السر المقترحة</label>
+                <input type="password" id="newPass" placeholder="كلمة السر" oninput="check(this.value)">
+                <div id="s-bar"><div id="s-fill"></div></div>
+            </div>
+            <button id="sendBtn" onclick="sendEmail()">إرسال الطلب للإدارة</button>
+            <button onclick="closeModal()" style="background:none; color:#64748b; margin-top:5px; border:none; width:100%; cursor:pointer;">إلغاء</button>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.js"></script>
     <script>
+        (function(){ emailjs.init("J6WMPCNz4MGxy6WjR"); })();
+
         function login() {
-            const u = document.getElementById('username').value, p = document.getElementById('password').value;
+            const u = document.getElementById('username').value, p = document.getElementById('password').value, e = document.getElementById('errorMessage');
+            // الحسابات المبرمجة مسبقاً
             if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
-                localStorage.setItem("currentUser", u); window.location.href = "dashboard.html";
-            } else { document.getElementById('errorMessage').style.display = "block"; document.getElementById('errorMessage').innerText = "خطأ في البيانات!"; }
+                localStorage.setItem("currentUser", u); 
+                window.location.href = "dashboard.html";
+            } else { 
+                e.style.display = "block"; 
+                e.innerText = "البيانات غير صحيحة، يرجى التأكد."; 
+            }
         }
-        function checkStrength(p) {
-            let s = p.length > 8 ? 100 : (p.length > 4 ? 66 : 33);
-            const bar = document.getElementById('strength-bar');
-            bar.style.width = s + "%"; bar.style.backgroundColor = s === 100 ? "green" : (s === 66 ? "orange" : "red");
+
+        function openModal() { document.getElementById('regModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('regModal').style.display = 'none'; }
+        
+        function check(v) {
+            let s = v.length > 8 ? 100 : (v.length > 4 ? 60 : 30);
+            const f = document.getElementById('s-fill');
+            f.style.width = s + "%"; 
+            f.style.background = s === 100 ? "#10b981" : (s === 60 ? "#f59e0b" : "#ef4444");
+        }
+
+        function sendEmail() {
+            const u = document.getElementById('newU').value;
+            const p = document.getElementById('newPass').value;
+            const btn = document.getElementById('sendBtn');
+
+            if(!u || !p) { alert("يرجى إدخال البيانات"); return; }
+
+            btn.innerText = "جاري الإرسال...";
+            btn.disabled = true;
+
+            emailjs.send('service_x51n5hk', 'template_0jv1nde', {
+                new_user: u,
+                new_pass: p
+            }).then(() => {
+                alert("✅ تم إرسال الطلب بنجاح!");
+                closeModal();
+                btn.innerText = "إرسال الطلب للإدارة";
+                btn.disabled = false;
+            }, (err) => {
+                alert("❌ فشل الإرسال: " + JSON.stringify(err));
+                btn.disabled = false;
+            });
         }
     </script>
 </body>
