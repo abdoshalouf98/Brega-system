@@ -8,99 +8,75 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { 
-            --primary: #004a99; --primary-dark: #003366; --bg: #f4f7fa; 
+            --primary: #004a99; --bg: #f4f7fa; 
             --danger: #ef4444; --warning: #f59e0b; --success: #10b981; 
-            --fuel-color: #f39c12; 
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
-        /* جعل الهيدر ثابتاً في الأعلى */
+        /* الهيدر الثابت */
         .header-container {
-            background: white; padding: 15px 5%; text-align: center;
-            border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: fixed; /* التعديل هنا: ثابت */
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000; /* لضمان بقائه فوق الخزانات */
+            background: white; padding: 10px 5%; text-align: center;
+            border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 110px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        
-        /* إضافة مساحة تحت الهيدر لأن الهيدر الثابت يخرج من تدفق الصفحة */
-        .container { 
-            padding: 160px 5% 40px 5%; /* تم زيادة الـ padding العلوي ليظهر المحتوى تحت الهيدر */
-        }
-
-        .header-logo { width: 80px; height: auto; margin-bottom: 5px; }
-        .header-title { margin: 2px 0; font-size: 1.3rem; color: var(--primary); font-weight: bold; }
+        .header-logo { width: 70px; height: auto; }
+        .header-title { margin: 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         .menu-btn { 
             position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
             background: white; border: 2px solid var(--primary); color: var(--primary); 
-            padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
+            padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600;
         }
 
-        /* القائمة الجانبية */
-        .sidebar {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: white; z-index: 1001; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column;
-        }
-        .sidebar.active { right: 0; }
-        .sidebar-header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee; }
-        .sidebar-content { flex-grow: 1; }
-        .nav-link { 
-            padding: 18px 25px; display: block; color: var(--primary); 
-            font-weight: bold; text-decoration: none; text-align: right; 
-            cursor: pointer; border-right: 4px solid transparent; transition: 0.2s;
-        }
-        .nav-link:hover { background: #f8fbff; border-right-color: var(--primary); }
-        .logout-box { border-top: 1px solid #eee; padding: 10px 0; margin-top: auto; }
-        .logout-btn { color: var(--danger); font-weight: bold; }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1000; }
-        .overlay.active { display: block; }
-
-        /* تنسيق الخزانات */
+        .container { padding: 140px 5% 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 650px) { 
-            .grid { grid-template-columns: 1fr; }
-            .container { padding-top: 180px; }
-        }
+        @media (max-width: 650px) { .grid { grid-template-columns: 1fr; } }
 
+        /* كرت الخزان */
         .tank-card { 
             background: white; border-radius: 12px; padding: 20px; text-align: center; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
             border: 1px solid #ebf0f5; position: relative;
         }
-        .temp-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; text-align: left; position: absolute; top: 15px; left: 15px; }
+        .temp-text { font-size: 0.85rem; color: var(--primary); font-weight: bold; position: absolute; top: 15px; left: 15px; }
         .tank-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
 
+        /* شكل الخزان */
         .tank-wrapper {
-            width: 140px; height: 90px; margin: 20px auto;
+            width: 140px; height: 90px; margin: 15px auto;
             position: relative; border: 3px solid #34495e; border-radius: 10px;
             background: #fff; overflow: hidden;
         }
         .tank-ladder {
             position: absolute; left: 50%; top: 0; transform: translateX(-50%);
-            width: 15px; height: 100%; border-left: 2px solid #34495e; border-right: 2px solid #34495e;
+            width: 14px; height: 100%; border-left: 2px solid #34495e; border-right: 2px solid #34495e;
             z-index: 4; background: repeating-linear-gradient(transparent, transparent 8px, #34495e 8px, #34495e 10px);
         }
-        .fuel-fill { position: absolute; bottom: 0; width: 100%; background: var(--fuel-color); transition: height 1s; z-index: 2; }
+        .fuel-fill { position: absolute; bottom: 0; width: 100%; transition: height 1s, background-color 0.5s; z-index: 2; }
+        
         .qty-val { font-size: 1.6rem; font-weight: 900; color: #2c3e50; margin: 5px 0; }
         .bar-container { background: #eee; height: 6px; border-radius: 3px; margin: 15px 10%; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--fuel-color); transition: width 1s; }
+        .bar-fill { height: 100%; transition: width 1s, background-color 0.5s; }
 
-        /* المودالات */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
-        .m-box { background: white; width: 95%; max-width: 500px; padding: 30px; border-radius: 15px; position: relative; }
+        /* الألوان بناءً على الحالة */
+        .status-danger { background-color: var(--danger) !important; }
+        .status-warning { background-color: var(--warning) !important; }
+        .status-success { background-color: var(--success) !important; }
+
+        /* القائمة الجانبية والمودالات */
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .sidebar.active { right: 0; }
+        .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-right: 4px solid transparent; }
+        .logout-btn { color: var(--danger); font-weight: bold; border-top: 1px solid #eee; margin-top: auto; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1500; }
+        .overlay.active { display: block; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; }
+        .m-box { background: white; width: 95%; max-width: 450px; padding: 25px; border-radius: 15px; }
         input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        #logsModal .m-box { max-width: 800px; max-height: 80vh; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-        th { background: #f8fbff; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -114,40 +90,38 @@
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header"><img src="./Logo.png.PNG" width="70" onerror="this.src='Logo.png'"></div>
-        <div class="sidebar-content">
+        <div class="sidebar-header" style="text-align:center; padding:20px;"><img src="./Logo.png.PNG" width="60" onerror="this.src='Logo.png'"></div>
+        <div class="sidebar-content" style="flex-grow:1;">
             <div class="nav-link" onclick="closeNav()">واجهة الخزانات</div>
             <div class="nav-link" onclick="openLogs()">كشف الحركات</div>
         </div>
-        <div class="logout-box">
-            <div class="nav-link logout-btn" onclick="logout()">تسجيل الخروج</div>
-        </div>
+        <div class="nav-link logout-btn" onclick="logout()">تسجيل الخروج</div>
     </div>
 
     <div class="container"><div class="grid" id="tanksGrid"></div></div>
 
     <div id="editModal" class="modal">
         <div class="m-box">
-            <h3 style="text-align:center;">تحديث البيانات</h3>
-            <label>كمية واردة (+)</label><input type="number" id="inQ" placeholder="0">
-            <label>كمية منصرفة (-)</label><input type="number" id="outQ" placeholder="0">
+            <h3 style="text-align:center;">تحديث بيانات الخزان</h3>
+            <label>وارد (+)</label><input type="number" id="inQ">
+            <label>منصرف (-)</label><input type="number" id="outQ">
             <label>الحرارة (°C)</label><input type="number" id="tempQ" step="0.1">
-            <button class="btn-save" onclick="saveData()">حفظ</button>
-            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer">إلغاء</button>
+            <button class="btn-save" onclick="saveData()">حفظ التعديلات</button>
+            <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer">إلغاء</button>
         </div>
     </div>
 
     <div id="logsModal" class="modal">
-        <div class="m-box">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="margin:0">سجل الحركات</h3>
-                <button onclick="downloadPDF()" style="background:var(--primary-dark); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">تصدير PDF</button>
+        <div class="m-box" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0">سجل حركات الخزانات</h3>
+                <button onclick="downloadPDF()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">PDF</button>
             </div>
-            <table>
-                <thead><tr><th>الوقت</th><th>الخزان</th><th>وارد</th><th>منصرف</th><th>المستخدم</th></tr></thead>
+            <table style="width:100%; border-collapse:collapse; text-align:center;">
+                <thead><tr style="background:#f8fbff;"><th>الوقت</th><th>الخزان</th><th>وارد</th><th>منصرف</th></tr></thead>
                 <tbody id="logsBody"></tbody>
             </table>
-            <button onclick="closeLogs()" style="width:100%; border:none; background:#eee; padding:10px; margin-top:15px; border-radius:5px; cursor:pointer;">إغلاق</button>
+            <button onclick="closeLogs()" style="width:100%; margin-top:15px; padding:10px; border:none; border-radius:5px; cursor:pointer;">إغلاق</button>
         </div>
     </div>
 
@@ -177,15 +151,26 @@
             allTanks = Object.values(snap.val() || {});
             const container = document.getElementById('tanksGrid');
             container.innerHTML = '';
+
             allTanks.forEach(t => {
                 const percent = (t.qty / t.cap) * 100;
+                let statusClass = 'status-success';
+                if (percent < 20) statusClass = 'status-danger';
+                else if (percent < 50) statusClass = 'status-warning';
+
                 container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
                         <div class="temp-text">${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
-                        <div class="tank-wrapper"><div class="tank-ladder"></div><div class="fuel-fill" style="height:${percent}%"></div></div>
+                        <div class="tank-wrapper">
+                            <div class="tank-ladder"></div>
+                            <div class="fuel-fill ${statusClass}" style="height:${percent}%"></div>
+                        </div>
                         <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="bar-container"><div class="bar-fill" style="width:${percent}%"></div></div>
+                        <div class="bar-container">
+                            <div class="bar-fill ${statusClass}" style="width:${percent}%"></div>
+                        </div>
+                        <div style="font-size:0.8rem; color:#666; font-weight:bold;">${percent.toFixed(1)}% ممتلئ</div>
                     </div>`;
             });
         });
@@ -193,7 +178,7 @@
         onValue(ref(db, 'logs'), (snap) => {
             const logs = Object.values(snap.val() || {}).reverse();
             document.getElementById('logsBody').innerHTML = logs.slice(0, 30).map(l => `
-                <tr><td>${l.time}</td><td>${l.tankName}</td><td style="color:green">+${l.added}</td><td style="color:red">-${l.subbed}</td><td>${l.user}</td></tr>
+                <tr style="border-bottom:1px solid #eee"><td style="padding:8px">${l.time}</td><td>${l.tankName}</td><td style="color:green">+${l.added}</td><td style="color:red">-${l.subbed}</td></tr>
             `).join('');
         });
 
