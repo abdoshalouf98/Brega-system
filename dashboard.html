@@ -13,83 +13,90 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
         
-        /* الهيدر الجديد: الشعار في المنتصف وكبير */
-        .top-section {
-            background: white; padding: 40px 5%; text-align: center;
-            border-bottom: 4px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            position: relative;
+        /* الهيدر: الشعار يميناً والخيارات يساراً */
+        .header { 
+            background: white; padding: 0.8rem 5%; display: flex; 
+            justify-content: space-between; align-items: center; position: sticky; top: 0; 
+            z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary);
         }
-        .main-logo { width: 150px; height: auto; margin-bottom: 15px; }
-        .company-title { font-size: 1.8rem; color: var(--primary); margin: 0; font-weight: 800; }
-        .user-badge { color: #64748b; font-size: 0.9rem; margin-top: 5px; }
 
-        /* زر الخيارات في الزاوية اليسرى العلوية */
+        /* الشعار والمعلومات على اليمين */
+        .header-info { display: flex; align-items: center; gap: 12px; order: 1; }
+        .header-logo { width: 50px; height: 50px; object-fit: contain; }
+
+        /* زر الخيارات على اليسار */
         .menu-btn { 
-            position: absolute; left: 20px; top: 20px;
             background: white; border: 1.5px solid var(--primary); color: var(--primary); 
-            padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+            padding: 8px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+            order: 2;
         }
         .menu-btn:hover { background: var(--primary); color: white; }
 
-        /* القائمة الجانبية */
+        /* القائمة الجانبية (Drawer) تخرج من اليسار لتناسب موقع الزر */
         .sidebar {
             position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background: white; z-index: 1001; transition: 0.4s;
+            background: white; z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
         .sidebar.active { left: 0; }
-        .nav-item { padding: 15px 25px; display: block; color: var(--primary); font-weight: 600; cursor: pointer; text-align: right; border-bottom: 1px solid #f1f5f9; }
-        .nav-item:hover { background: #f0f7ff; }
-        .logout-item { color: var(--danger); margin-top: auto; border-top: 1px solid #eee; }
+
+        .sidebar-header { padding: 30px 20px; border-bottom: 1px solid #eee; text-align: center; }
+        .nav-item { 
+            padding: 15px 25px; display: block; color: var(--primary); text-decoration: none;
+            font-weight: 600; transition: 0.2s; cursor: pointer; border-left: 4px solid transparent;
+            text-align: right;
+        }
+        .nav-item:hover { background: #f0f7ff; border-left-color: var(--primary); }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #eee; margin-top: auto; }
+        .logout-item { color: var(--danger); }
 
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1000; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
-        /* شبكة الخزانات: 4 في كل صف */
-        .container { padding: 40px 5%; }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); /* 4 أعمدة ثابتة */
-            gap: 20px; 
-        }
-
-        /* تعديل التصميم للشاشات الصغيرة لتصبح 2 أو 1 بدل 4 */
-        @media (max-width: 1024px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
-
-        .tank-card { background: white; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.3s; }
-        .tank-card:hover { transform: scale(1.02); }
-        .tank-vis { width: 70px; height: 100px; border: 3px solid #334155; margin: 10px auto; position: relative; border-radius: 10px; background: #f8fafc; overflow: hidden; }
+        /* تنسيق كروت الخزانات */
+        .container { padding: 30px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; }
+        .tank-vis { width: 80px; height: 120px; border: 3px solid #334155; margin: 15px auto; position: relative; border-radius: 12px; background: #f8fafc; overflow: hidden; }
         .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s ease; }
-        .qty { font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); }
-        .p-bar { background: #e2e8f0; height: 6px; border-radius: 10px; overflow: hidden; margin: 8px 0; }
+        .qty { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
+        .p-bar { background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
         .p-fill { height: 100%; transition: width 1s ease; }
 
-        /* النوافذ */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
         .m-content { background: white; width: 90%; max-width: 450px; padding: 30px; border-radius: 20px; }
-        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
         .update-btn { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="top-section">
+    <header class="header">
+        <div class="header-info">
+            <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'" alt="Logo">
+            <div style="text-align: right;">
+                <h1 style="margin:0; font-size:1.1rem; color:var(--primary)">شركة البريقة</h1>
+                <div id="userRole" style="font-size:0.75rem; color:#64748b"></div>
+            </div>
+        </div>
+
         <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
-        <img src="./Logo.png.PNG" class="main-logo" onerror="this.src='Logo.png'" alt="Logo">
-        <h1 class="company-title">شركة البريقة لتسويق النفط</h1>
-        <div id="userRole" class="user-badge"></div>
-    </div>
+    </header>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #eee;">
-            <strong>القائمة</strong>
+        <div class="sidebar-header">
+            <img src="./Logo.png.PNG" style="width: 80px;" onerror="this.src='Logo.png'">
+            <h3 style="color: var(--primary-dark); margin-top: 10px;">القائمة الرئيسية</h3>
         </div>
-        <div class="nav-item" onclick="toggleMenu()">الرئيسية</div>
-        <div class="nav-item" onclick="openLogs(); toggleMenu()">كشف الحركات</div>
-        <div class="nav-item logout-item" onclick="logout()">تسجيل الخروج</div>
+        <div class="sidebar-content">
+            <div class="nav-item" onclick="toggleMenu()">الصفحة الرئيسية</div>
+            <div class="nav-item" onclick="openLogs(); toggleMenu()">كشف الحركات</div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="nav-item logout-item" onclick="logout()">تسجيل الخروج</div>
+        </div>
     </div>
 
     <div class="container">
@@ -98,22 +105,31 @@
 
     <div id="editModal" class="modal">
         <div class="m-content">
-            <h3 id="mTankTitle" style="text-align:center;">تحديث البيانات</h3>
-            <label>وارد (+)</label><input type="number" id="inQ">
-            <label>منصرف (-)</label><input type="number" id="outQ">
-            <label>حرارة (°C)</label><input type="number" id="tempQ" step="0.1">
-            <button class="update-btn" onclick="save()">حفظ</button>
-            <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; cursor:pointer;">إلغاء</button>
+            <h3 id="mTankTitle" style="text-align:center; margin-top:0">تحديث بيانات الخزان</h3>
+            <label>كمية واردة (+)</label>
+            <input type="number" id="inQ" placeholder="أدخل الكمية">
+            <label>كمية منصرفة (-)</label>
+            <input type="number" id="outQ" placeholder="أدخل الكمية">
+            <label>الحرارة الحاليّة (°C)</label>
+            <input type="number" id="tempQ" step="0.1">
+            <button class="update-btn" onclick="save()">تحديث وحفظ</button>
+            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#94a3b8; margin-top:15px; cursor:pointer">إلغاء</button>
         </div>
     </div>
 
     <div id="logsModal" class="modal">
-        <div class="m-content" style="max-width:750px;">
-            <h3>سجل الحركات</h3>
-            <table style="width:100%; text-align:center;">
+        <div class="m-content" style="max-width:750px; max-height:85vh; overflow-y:auto">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <h3 style="margin:0">سجل حركات النظام</h3>
+                <button onclick="downloadPDF()" style="background:var(--primary-dark); color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer">تصدير PDF</button>
+            </div>
+            <table style="width:100%; border-collapse:collapse; margin-top:15px; text-align:center;">
+                <thead style="background:#f8fafc">
+                    <tr><th style="padding:10px">الوقت</th><th>الخزان</th><th>الوارد</th><th>المنصرف</th><th>المستخدم</th></tr>
+                </thead>
                 <tbody id="logsBody"></tbody>
             </table>
-            <button onclick="closeLogs()" style="width:100%; padding:10px; margin-top:10px;">إغلاق</button>
+            <button onclick="closeLogs()" style="width:100%; background:none; border:none; margin-top:20px; color:var(--primary); cursor:pointer; font-weight:bold">إلغاء</button>
         </div>
     </div>
 
@@ -134,44 +150,86 @@
         const user = localStorage.getItem("currentUser") || "40366";
         let allTanks = [];
 
-        window.toggleMenu = () => {
+        window.toggleMenu = function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
         onValue(ref(db, 'tanks'), (snap) => {
             allTanks = Object.values(snap.val() || {});
+            draw();
+        });
+
+        onValue(ref(db, 'logs'), (snap) => {
+            const logs = Object.values(snap.val() || {}).reverse();
+            document.getElementById('logsBody').innerHTML = logs.map(l => `
+                <tr style="border-bottom:1px solid #eee">
+                    <td style="font-size:0.75rem; padding:10px">${l.time}</td>
+                    <td style="font-weight:bold">${l.tankName}</td>
+                    <td style="color:var(--success)">+${l.added}</td>
+                    <td style="color:var(--danger)">-${l.subbed}</td>
+                    <td>${l.user}</td>
+                </tr>
+            `).join('');
+        });
+
+        window.draw = function() {
             const g = document.getElementById('tanksGrid');
             g.innerHTML = '';
             document.getElementById('userRole').innerText = "رقم الموظف: " + user;
 
             allTanks.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
-                let color = p <= 25 ? "var(--danger)" : (p <= 75 ? "var(--warning)" : "var(--success)");
+                let color;
+                if (p <= 25) color = "var(--danger)";
+                else if (p <= 75) color = "var(--warning)";
+                else color = "var(--success)";
 
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div style="font-size:0.7rem; font-weight:bold; color:var(--primary)">${t.temp}°C</div>
-                        <h4 style="margin:5px 0">${t.name}</h4>
+                        <div style="font-size:0.8rem; color:var(--primary); font-weight:bold; text-align:right">${t.temp}°C</div>
+                        <h3 style="margin:10px 0">${t.name}</h3>
                         <div class="tank-vis">
                             <div class="fuel" style="height:${p}%; background:${color}"></div>
                         </div>
                         <div class="qty">${Math.round(t.qty).toLocaleString()} L</div>
                         <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${color}"></div></div>
+                        <small style="color:#94a3b8">${p.toFixed(1)}% ممتلئ</small>
                     </div>`;
             });
-        });
+        }
 
-        window.openEdit = (id) => { window.currentId = id; document.getElementById('editModal').style.display = 'flex'; }
-        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
-        window.save = () => {
+        window.save = function() {
             const idx = allTanks.findIndex(x => x.id === window.currentId);
             const inV = parseFloat(document.getElementById('inQ').value) || 0;
             const outV = parseFloat(document.getElementById('outQ').value) || 0;
+            const tempV = parseFloat(document.getElementById('tempQ').value);
+
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inV - outV));
+            if(!isNaN(tempV)) allTanks[idx].temp = tempV;
+
+            push(ref(db, 'logs'), {
+                time: new Date().toLocaleString('ar-LY'),
+                tankName: allTanks[idx].name,
+                added: inV,
+                subbed: outV,
+                user: user
+            });
+
             set(ref(db, 'tanks'), allTanks).then(closeEdit);
         }
+
+        window.openEdit = (id) => { window.currentId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
+        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; }
+        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
         window.logout = () => { localStorage.clear(); window.location.replace("index.html"); }
+        window.downloadPDF = () => {
+             const { jsPDF } = window.jspdf;
+             const doc = new jsPDF();
+             doc.autoTable({ html: 'table' });
+             doc.save('Brega_Report.pdf');
+        }
     </script>
 </body>
 </html>
