@@ -3,197 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دخول | شركة البريقة لتسويق النفط</title>
+    <title>تسجيل الدخول - منظومة البريقة</title>
     <style>
-        /* إعدادات الخط والألوان الأساسية */
-        :root {
-            --primary: #004a99;
-            --secondary: #002d5d;
-            --accent: #f59e0b;
-            --white: #ffffff;
-            --bg-gradient: linear-gradient(135deg, #004a99 0%, #002d5d 100%);
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: #004a99; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
         }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: all 0.3s ease;
+        .login-card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+            width: 90%; 
+            max-width: 350px; 
+            text-align: center; 
         }
-
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            overflow: hidden; /* يمنع التمرير غير الضروري في الصفحة الرئيسية */
+        h2 { color: #333; margin-bottom: 25px; }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            border: 1px solid #ddd; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 16px;
         }
-
-        /* الحاوية الرئيسية المتحركة */
-        .login-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            width: 90%; /* تأخذ 90% من الشاشة في الموبايل */
-            max-width: 450px; /* لا تزيد عن 450 بكسل في الكمبيوتر */
-            text-align: center;
-            animation: fadeIn 0.8s ease-out;
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: #004a99; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            margin-top: 10px;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo-area img {
-            width: 120px;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            color: var(--secondary);
-            margin-bottom: 10px;
-            font-size: 1.8rem;
-        }
-
-        p {
-            color: #64748b;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
-
-        /* الحقول المتجاوبة */
-        .input-group {
-            position: relative;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            font-size: 1rem;
-            text-align: center;
-            outline: none;
-            background: #f8fafc;
-        }
-
-        input:focus {
-            border-color: var(--primary);
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0,74,153,0.1);
-        }
-
-        /* الأزرار الراقية */
-        .btn-login {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,74,153,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-login:hover {
-            background: var(--secondary);
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(0,74,153,0.4);
-        }
-
-        .btn-login:active {
-            transform: scale(0.98);
-        }
-
-        #msg {
-            color: #ef4444;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            height: 20px;
-        }
-
-        /* لجعل التصميم يتكيف مع الشاشات الصغيرة جداً */
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 30px 20px;
-            }
-            h2 { font-size: 1.5rem; }
-        }
+        button:hover { background: #003366; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="logo-area">
-            <div style="font-size: 50px; margin-bottom: 10px;">⛽</div>
-            <h2>منظومة البريقة</h2>
-            <p>مرحباً بك، يرجى تسجيل الدخول للمتابعة</p>
-        </div>
-
-        <div class="input-group">
-            <input type="password" id="idInput" placeholder="أدخل الرقم الوظيفي">
-        </div>
-
-        <button class="btn-login" onclick="login()">
-            <span>دخول للمنظومة</span>
-            <span>🔑</span>
-        </button>
-
-        <p id="msg"></p>
-
-        <div style="margin-top: 20px; font-size: 0.8rem; color: #94a3b8;">
-            © 2026 شركة البريقة لتسويق النفط - تقنية المعلومات
-        </div>
+    <div class="login-card">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="uid" placeholder="اسم المستخدم (الرقم الوظيفي)">
+        <input type="password" id="ups" placeholder="كلمة السر">
+        <button onclick="login()">دخول</button>
     </div>
 
     <script>
         function login() {
-            const input = document.getElementById('idInput');
-            const msg = document.getElementById('msg');
-            const id = input.value.trim();
+            const id = document.getElementById('uid').value;
+            const ps = document.getElementById('ups').value;
 
-            if (id === "40366" || id === "36640") {
+            // التحقق من البيانات (المدير العام ومشرف الخزان 2)
+            if((id === "40366" && ps === "123") || (id === "36640" && ps === "456")) {
                 localStorage.setItem("currentUser", id);
-                msg.style.color = "#10b981";
-                msg.innerText = "جاري التحميل...";
-                
-                // إضافة تأثير انتقال بسيط
-                setTimeout(() => {
-                    window.location.href = "dashboard.html";
-                }, 500);
-            } else {
-                msg.style.color = "#ef4444";
-                msg.innerText = "الرقم الوظيفي غير صحيح!";
-                input.style.borderColor = "#ef4444";
-                
-                // هز الحقل عند الخطأ
-                input.parentElement.animate([
-                    { transform: 'translateX(-5px)' },
-                    { transform: 'translateX(5px)' }
-                ], { duration: 100, iterations: 3 });
+                location.replace('dashboard.html');
+            } else { 
+                alert("خطأ في اسم المستخدم أو كلمة السر!"); 
             }
         }
-
-        // تفعيل الدخول بالضغط على زر Enter
-        document.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                login();
-            }
-        });
     </script>
+
 </body>
 </html>
