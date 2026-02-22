@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دخول - شركة البريقة</title>
+    <style>
+        :root { --p: #004a99; --s: #002d5d; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; direction: rtl; }
+        .card { background: white; padding: 40px 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .logo { width: 120px; margin-bottom: 20px; }
+        h2 { color: var(--s); margin: 0 0 30px 0; font-size: 1.5rem; }
+        .group { text-align: right; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #64748b; font-size: 0.9rem; }
+        input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; box-sizing: border-box; outline: none; transition: 0.3s; background: #f8fafc; font-size: 1rem; }
+        input:focus { border-color: var(--p); background: white; box-shadow: 0 0 0 4px rgba(0,74,153,0.1); }
+        button { width: 100%; padding: 16px; background: var(--p); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: var(--s); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,74,153,0.2); }
+        .error { color: #ef4444; font-size: 0.85rem; margin-top: 15px; display: none; background: #fee2e2; padding: 10px; border-radius: 8px; }
+        .reg { margin-top: 25px; font-size: 0.9rem; color: #94a3b8; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+        .reg a { color: var(--p); text-decoration: none; font-weight: bold; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
+        .m-content { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 24px; position: relative; }
+        #s-bar { height: 4px; background: #e2e8f0; margin-top: 8px; border-radius: 2px; overflow: hidden; }
+        #s-fill { height: 100%; width: 0; transition: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png" class="logo">
+        <h2>تتبع الخزانات الذكي</h2>
+        <div class="group"><label>الرقم الوظيفي</label><input type="text" id="username" placeholder="مثلاً: 40366"></div>
+        <div class="group"><label>كلمة السر</label><input type="password" id="password" placeholder="••••••••"></div>
+        <button onclick="login()">تسجيل الدخول</button>
+        <div id="errorMessage" class="error"></div>
+        <div class="reg">لا تملك صلاحية؟ <a href="#" onclick="openModal()">طلب حساب</a></div>
+    </div>
+
+    <div id="regModal" class="modal">
+        <div class="m-content">
+            <h3 style="margin-top:0; color:var(--s)">طلب تسجيل جديد</h3>
+            <div class="group"><label>الرقم الوظيفي</label><input type="text" id="newU"></div>
+            <div class="group">
+                <label>كلمة السر المقترحة</label>
+                <input type="password" id="newPass" oninput="check(this.value)">
+                <div id="s-bar"><div id="s-fill"></div></div>
+            </div>
+            <button id="sendBtn" onclick="sendEmail()">إرسال الطلب للإدارة</button>
+            <button onclick="closeModal()" style="background:none; color:#64748b; margin-top:5px; border:none; width:100%; cursor:pointer;">إلغاء</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.js"></script>
+    <script>
+        (function(){ emailjs.init("J6WMPCNz4MGxy6WjR"); })();
+
+        function login() {
+            const u = document.getElementById('username').value, p = document.getElementById('password').value, e = document.getElementById('errorMessage');
+            if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
+                localStorage.setItem("currentUser", u); window.location.href = "dashboard.html";
+            } else { e.style.display = "block"; e.innerText = "البيانات غير صحيحة، يرجى التأكد."; }
+        }
+
+        function openModal() { document.getElementById('regModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('regModal').style.display = 'none'; }
+        
+        function check(v) {
+            let s = v.length > 8 ? 100 : (v.length > 4 ? 60 : 30);
+            const f = document.getElementById('s-fill');
+            f.style.width = s + "%"; f.style.background = s === 100 ? "#10b981" : (s === 60 ? "#f59e0b" : "#ef4444");
+        }
+
+        function sendEmail() {
+            const u = document.getElementById('newU').value;
+            const p = document.getElementById('newPass').value;
+            const btn = document.getElementById('sendBtn');
+
+            if(!u || !p) { alert("يرجى إدخال البيانات"); return; }
+
+            btn.innerText = "جاري الإرسال...";
+            btn.disabled = true;
+
+            emailjs.send('service_x51n5hk', 'template_0jv1nde', {
+                new_user: u,
+                new_pass: p
+            }).then(() => {
+                alert("✅ تم إرسال الطلب بنجاح!");
+                closeModal();
+                btn.innerText = "إرسال الطلب للإدارة";
+                btn.disabled = false;
+            }, (err) => {
+                alert("❌ فشل الإرسال: " + JSON.stringify(err));
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
