@@ -13,53 +13,49 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
         
-        /* الهيدر مع زر الخيارات على اليمين */
+        /* الهيدر المعدل: الزر يميناً والشعار يساراً */
         .header { 
-            background: white; padding: 0.8rem 5%; display: flex; flex-direction: row-reverse; /* عكس الاتجاه ليصبح الزر يميناً */
+            background: white; padding: 0.8rem 5%; display: flex; 
             justify-content: space-between; align-items: center; position: sticky; top: 0; 
             z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary);
         }
-        .header-info { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; }
-        .header-logo { width: 50px; height: 50px; object-fit: contain; }
 
-        /* زر الخيارات في مكانه الجديد على اليمين */
+        /* زر الخيارات على اليمين */
         .menu-btn { 
             background: white; border: 1.5px solid var(--primary); color: var(--primary); 
             padding: 8px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+            order: 1; /* يضمن بقاءه في المركز الأول جهة اليمين */
         }
         .menu-btn:hover { background: var(--primary); color: white; }
 
-        /* القائمة الجانبية (Drawer) */
+        /* الشعار والمعلومات على اليسار */
+        .header-info { display: flex; align-items: center; gap: 12px; order: 2; text-align: left; }
+        .header-logo { width: 50px; height: 50px; object-fit: contain; }
+
+        /* القائمة الجانبية */
         .sidebar {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
             background: white; z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
         .sidebar.active { right: 0; }
-
         .sidebar-header { padding: 30px 20px; border-bottom: 1px solid #eee; text-align: center; }
-        .sidebar-content { flex: 1; padding: 20px 0; }
-        
         .nav-item { 
             padding: 15px 25px; display: block; color: var(--primary); text-decoration: none;
             font-weight: 600; transition: 0.2s; cursor: pointer; border-right: 4px solid transparent;
             text-align: right;
         }
         .nav-item:hover { background: #f0f7ff; border-right-color: var(--primary); }
-
-        .sidebar-footer { padding: 20px; border-top: 1px solid #eee; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid #eee; margin-top: auto; }
         .logout-item { color: var(--danger); }
-        .logout-item:hover { background: #fff5f5; border-right-color: var(--danger); }
 
-        .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.4); 
-            display: none; z-index: 1000; backdrop-filter: blur(2px);
-        }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1000; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
+        /* تنسيق كروت الخزانات */
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.3s; }
+        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; }
         .tank-vis { width: 80px; height: 120px; border: 3px solid #334155; margin: 15px auto; position: relative; border-radius: 12px; background: #f8fafc; overflow: hidden; }
         .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s ease; }
         .qty { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
@@ -78,7 +74,7 @@
         <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
 
         <div class="header-info">
-            <div>
+            <div style="text-align: left;">
                 <h1 style="margin:0; font-size:1.1rem; color:var(--primary)">شركة البريقة</h1>
                 <div id="userRole" style="font-size:0.75rem; color:#64748b"></div>
             </div>
