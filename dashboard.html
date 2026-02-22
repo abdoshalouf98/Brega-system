@@ -18,7 +18,10 @@
             border-bottom: 3px solid var(--primary);
         }
         .header-info { display: flex; align-items: center; gap: 15px; }
-        .header-logo { width: 60px; height: auto; object-fit: contain; }
+        
+        /* تحسين مظهر الشعار */
+        .header-logo { width: 70px; height: 70px; object-fit: contain; display: block; }
+
         .nav-btn { background: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
         .nav-btn:hover { background: var(--primary); color: white; }
         .container { padding: 30px 5%; }
@@ -42,7 +45,7 @@
 
     <header class="header">
         <div class="header-info">
-            <img src="Logo.png.PNG" class="header-logo" alt="شركة البريقة">
+            <img src="./Logo.png.PNG" class="header-logo" id="mainLogo" onerror="this.src='Logo.png'" alt="شركة البريقة">
             <div>
                 <h1 style="margin:0; font-size:1.2rem; color:var(--primary)">منظومة البريقة</h1>
                 <div id="userRole" style="font-size:0.8rem; color:#64748b"></div>
@@ -65,17 +68,17 @@
             <input type="number" id="inQ" placeholder="الرقم الوظيفي">
             <label>الكمية المنصرفة (-)</label>
             <input type="number" id="outQ" placeholder="كلمة السر">
-            <label>الحرارة (°C)</label>
+            <label>درجة الحرارة الحاليّة (°C)</label>
             <input type="number" id="tempQ" step="0.1">
             <button class="update-btn" onclick="save()">حفظ التعديلات</button>
-            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#94a3b8; margin-top:10px; cursor:pointer">إلغاء</button>
+            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#94a3b8; margin-top:15px; cursor:pointer">إلغاء</button>
         </div>
     </div>
 
     <div id="logsModal" class="modal">
         <div class="m-content" style="max-width:700px; max-height:80vh; overflow-y:auto">
             <div style="display:flex; justify-content:space-between; align-items:center">
-                <h3>سجل الحركات الأخير</h3>
+                <h3>سجل الحركات</h3>
                 <button onclick="downloadPDF()" style="background:#334155; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer">تصدير PDF</button>
             </div>
             <table>
@@ -129,7 +132,7 @@
             allTanks.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
                 
-                // تدرج الألوان المطلوب:
+                // منطق الألوان الموحد لكل الخزانات
                 let color;
                 if (p <= 25) color = "#ef4444"; // أحمر
                 else if (p <= 75) color = "#f59e0b"; // أصفر
