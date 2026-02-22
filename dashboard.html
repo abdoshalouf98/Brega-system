@@ -13,16 +13,16 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
         
-        /* الهيدر الجديد */
+        /* الهيدر مع زر الخيارات على اليمين */
         .header { 
-            background: white; padding: 0.8rem 5%; display: flex; justify-content: space-between; 
-            align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 3px solid var(--primary);
+            background: white; padding: 0.8rem 5%; display: flex; flex-direction: row-reverse; /* عكس الاتجاه ليصبح الزر يميناً */
+            justify-content: space-between; align-items: center; position: sticky; top: 0; 
+            z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary);
         }
-        .header-info { display: flex; align-items: center; gap: 12px; }
+        .header-info { display: flex; align-items: center; gap: 12px; flex-direction: row-reverse; }
         .header-logo { width: 50px; height: 50px; object-fit: contain; }
 
-        /* زر الخيارات */
+        /* زر الخيارات في مكانه الجديد على اليمين */
         .menu-btn { 
             background: white; border: 1.5px solid var(--primary); color: var(--primary); 
             padding: 8px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
@@ -43,6 +43,7 @@
         .nav-item { 
             padding: 15px 25px; display: block; color: var(--primary); text-decoration: none;
             font-weight: 600; transition: 0.2s; cursor: pointer; border-right: 4px solid transparent;
+            text-align: right;
         }
         .nav-item:hover { background: #f0f7ff; border-right-color: var(--primary); }
 
@@ -50,14 +51,12 @@
         .logout-item { color: var(--danger); }
         .logout-item:hover { background: #fff5f5; border-right-color: var(--danger); }
 
-        /* الطبقة الشفافة خلف القائمة */
         .overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.4); 
             display: none; z-index: 1000; backdrop-filter: blur(2px);
         }
         .overlay.active { display: block; }
 
-        /* تنسيق الخزانات */
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #eef2f6; box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.3s; }
@@ -67,7 +66,6 @@
         .p-bar { background: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
         .p-fill { height: 100%; transition: width 1s ease; }
 
-        /* النوافذ المنبثقة */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
         .m-content { background: white; width: 90%; max-width: 450px; padding: 30px; border-radius: 20px; }
         input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
@@ -77,14 +75,15 @@
 <body>
 
     <header class="header">
+        <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
+
         <div class="header-info">
-            <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'" alt="Logo">
             <div>
                 <h1 style="margin:0; font-size:1.1rem; color:var(--primary)">شركة البريقة</h1>
                 <div id="userRole" style="font-size:0.75rem; color:#64748b"></div>
             </div>
+            <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'" alt="Logo">
         </div>
-        <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
     </header>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
@@ -153,7 +152,6 @@
         const user = localStorage.getItem("currentUser") || "40366";
         let allTanks = [];
 
-        // دوام القائمة الجانبية
         window.toggleMenu = function() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
