@@ -14,20 +14,32 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
+        /* جعل الهيدر ثابتاً في الأعلى */
         .header-container {
-            background: white; padding: 20px 5%; text-align: center;
+            background: white; padding: 15px 5%; text-align: center;
             border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: relative;
+            position: fixed; /* التعديل هنا: ثابت */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* لضمان بقائه فوق الخزانات */
         }
-        .header-logo { width: 100px; height: auto; margin-bottom: 5px; }
-        .header-title { margin: 5px 0; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
+        
+        /* إضافة مساحة تحت الهيدر لأن الهيدر الثابت يخرج من تدفق الصفحة */
+        .container { 
+            padding: 160px 5% 40px 5%; /* تم زيادة الـ padding العلوي ليظهر المحتوى تحت الهيدر */
+        }
+
+        .header-logo { width: 80px; height: auto; margin-bottom: 5px; }
+        .header-title { margin: 2px 0; font-size: 1.3rem; color: var(--primary); font-weight: bold; }
 
         .menu-btn { 
-            position: absolute; right: 20px; top: 20px;
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
             background: white; border: 2px solid var(--primary); color: var(--primary); 
             padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
         }
 
+        /* القائمة الجانبية */
         .sidebar {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
             background: white; z-index: 1001; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
@@ -49,10 +61,12 @@
         .overlay.active { display: block; }
 
         /* تنسيق الخزانات */
-        .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 650px) { .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 650px) { 
+            .grid { grid-template-columns: 1fr; }
+            .container { padding-top: 180px; }
+        }
 
         .tank-card { 
             background: white; border-radius: 12px; padding: 20px; text-align: center; 
@@ -63,7 +77,7 @@
         .tank-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
 
         .tank-wrapper {
-            width: 160px; height: 100px; margin: 20px auto;
+            width: 140px; height: 90px; margin: 20px auto;
             position: relative; border: 3px solid #34495e; border-radius: 10px;
             background: #fff; overflow: hidden;
         }
@@ -73,7 +87,7 @@
             z-index: 4; background: repeating-linear-gradient(transparent, transparent 8px, #34495e 8px, #34495e 10px);
         }
         .fuel-fill { position: absolute; bottom: 0; width: 100%; background: var(--fuel-color); transition: height 1s; z-index: 2; }
-        .qty-val { font-size: 1.8rem; font-weight: 900; color: #2c3e50; margin: 5px 0; }
+        .qty-val { font-size: 1.6rem; font-weight: 900; color: #2c3e50; margin: 5px 0; }
         .bar-container { background: #eee; height: 6px; border-radius: 3px; margin: 15px 10%; overflow: hidden; }
         .bar-fill { height: 100%; background: var(--fuel-color); transition: width 1s; }
 
@@ -83,7 +97,6 @@
         input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
-        /* كشف الحركات */
         #logsModal .m-box { max-width: 800px; max-height: 80vh; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
@@ -101,7 +114,7 @@
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header"><img src="./Logo.png.PNG" width="80" onerror="this.src='Logo.png'"></div>
+        <div class="sidebar-header"><img src="./Logo.png.PNG" width="70" onerror="this.src='Logo.png'"></div>
         <div class="sidebar-content">
             <div class="nav-link" onclick="closeNav()">واجهة الخزانات</div>
             <div class="nav-link" onclick="openLogs()">كشف الحركات</div>
@@ -128,7 +141,7 @@
         <div class="m-box">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="margin:0">سجل الحركات</h3>
-                <button onclick="downloadPDF()" style="background:var(--primary-dark); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">PDF</button>
+                <button onclick="downloadPDF()" style="background:var(--primary-dark); color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">تصدير PDF</button>
             </div>
             <table>
                 <thead><tr><th>الوقت</th><th>الخزان</th><th>وارد</th><th>منصرف</th><th>المستخدم</th></tr></thead>
@@ -157,7 +170,6 @@
 
         window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
         window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
 
@@ -193,10 +205,8 @@
             const inVal = parseFloat(document.getElementById('inQ').value) || 0;
             const outVal = parseFloat(document.getElementById('outQ').value) || 0;
             const tempVal = parseFloat(document.getElementById('tempQ').value);
-
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
-
             push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal, user: user });
             set(ref(db, 'tanks'), allTanks).then(closeEdit);
         }
