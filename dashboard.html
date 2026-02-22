@@ -8,76 +8,79 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --p: #004a99; --s: #002d5d; --bg: #f1f5f9; --ok: #10b981; --err: #ef4444; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
-        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .nav-btn { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
+        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .menu-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 5px; margin-left: 20px; }
+        .menu-btn span { width: 25px; height: 3px; background: white; border-radius: 2px; }
+
+        /* القائمة الجانبية المحدثة */
+        .sidebar { position: fixed; right: -280px; top: 0; width: 280px; height: 100%; background: var(--s); color: white; transition: 0.3s; z-index: 2000; display: flex; flex-direction: column; }
+        .sidebar.active { right: 0; }
+        .nav-links { flex-grow: 1; padding-top: 60px; } /* يدفع الأزرار للأسفل */
+        .sidebar-item { padding: 18px 25px; cursor: pointer; color: white; text-decoration: none; display: block; font-size: 1.1rem; border: none; } /* حذف الحدود */
+        .sidebar-item:hover { background: var(--p); }
+        .logout-item { padding: 20px 25px; background: rgba(239, 68, 68, 0.1); color: #ff8888; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; } /* تسجيل الخروج في الأسفل */
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; }
+        .overlay.active { display: block; }
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #e2e8f0; cursor: pointer; }
         .tank-vis { width: 90px; height: 130px; border: 4px solid #334155; margin: 15px auto; position: relative; border-radius: 12px; background: #f1f5f9; overflow: hidden; }
-        .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; background: var(--ok); }
-        .qty { font-size: 1.5rem; font-weight: 800; color: var(--s); }
-        
-        /* تنسيق منطقة الـ PDF لضمان وضوح العربية */
-        #pdf-area { background: white; padding: 30px; color: black; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; direction: rtl; }
-        th, td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 11pt; }
-        th { background: #f2f2f2; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+        .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 3000; align-items: center; justify-content: center; }
         .m-content { background: white; width: 95%; max-width: 850px; padding: 25px; border-radius: 20px; max-height: 85vh; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #000; }
+        th, td { border: 1px solid #000; padding: 12px; text-align: center; }
     </style>
 </head>
 <body>
-
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <header class="header">
-        <div><h2 style="margin:0">منظومة البريقة الذكية</h2><small id="userRole"></small></div>
-        <div class="btns-group">
-            <button onclick="openLogs()" class="nav-btn">📊 كشف الحركات</button>
-            <button onclick="location.replace('index.html')" class="nav-btn">خروج 🔄</button>
-        </div>
+        <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+        <h2 style="margin:0">منظومة البريقة</h2>
     </header>
 
-    <div class="container"><div class="grid" id="tanksGrid"></div></div>
-
-    <div id="editModal" class="modal">
-        <div class="m-content" style="max-width: 400px;">
-            <h3 style="text-align:center">تحديث كمية الخزان</h3>
-            <label>وارد (+)</label><input type="number" id="inQ" placeholder="0" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-            <label>منصرف (-)</label><input type="number" id="outQ" placeholder="0" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-            <button class="nav-btn" style="background:var(--ok); width:100%; color:white;" onclick="save()">حفظ البيانات</button>
-            <button onclick="closeEdit()" style="width:100%; background:none; border:none; margin-top:15px; color:gray; cursor:pointer;">إلغاء</button>
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-links">
+            <div class="sidebar-item" onclick="toggleMenu()">الصفحة الرئيسية</div>
+            <div class="sidebar-item" onclick="openLogs(); toggleMenu();">كشف حركات الخزانات</div>
         </div>
+        <div class="sidebar-item logout-item" onclick="logout()">تسجيل الخروج</div>
+    </nav>
+
+    <div class="container">
+        <h3 id="userRole">...</h3>
+        <div class="grid" id="tanksGrid"></div>
     </div>
 
     <div id="logsModal" class="modal">
         <div class="m-content">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="margin:0">كشف حركات الخزانات</h2>
-                <button onclick="downloadPDF()" id="pdfBtn" style="background:#dc2626; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">حفظ PDF (عربي) 📄</button>
+                <button onclick="downloadPDF()" style="background:var(--err); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">PDF 📄</button>
             </div>
-            
             <div id="pdf-area">
-                <div style="text-align:center; margin-bottom: 30px;">
-                    <h1 style="margin:0; color:#004a99;">شركة البريقة لتسويق النفط</h1>
-                    <h3 style="margin:5px 0;">تقرير حركة المخزون التراكمي</h3>
-                    <p>التاريخ: <span id="currentDate"></span></p>
+                <div style="text-align:center; border-bottom: 2px solid var(--p); padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2 style="color:var(--p); margin:0;">شركة البريقة لتسويق النفط</h2>
+                    <p>كشف المخزون بتاريخ: <span id="currentDate"></span></p>
                 </div>
-                <table id="logsTable">
-                    <thead>
-                        <tr>
-                            <th>التوقيت</th>
-                            <th>الخزان</th>
-                            <th>الوارد</th>
-                            <th>المنصرف</th>
-                            <th>المتبقي (تراكمي)</th>
-                            <th>الموظف</th>
-                        </tr>
-                    </thead>
+                <table>
+                    <thead><tr><th>التوقيت</th><th>الخزان</th><th>الوارد</th><th>منصرف</th><th>المتبقي</th><th>الموظف</th></tr></thead>
                     <tbody id="logsBody"></tbody>
                 </table>
             </div>
             <button onclick="closeLogs()" style="width:100%; border:none; margin-top:20px; color:gray; cursor:pointer;">إغلاق</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="m-content" style="max-width: 400px;">
+            <h3>تحديث الكمية</h3>
+            <input type="number" id="inQ" placeholder="وارد (+)">
+            <input type="number" id="outQ" placeholder="منصرف (-)">
+            <button onclick="save()" style="background:var(--ok); width:100%; color:white; padding:12px; border:none; border-radius:10px;">حفظ</button>
+            <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; color:gray;">إلغاء</button>
         </div>
     </div>
 
@@ -91,26 +94,29 @@
             projectId: "brega-system",
             databaseURL: "https://brega-system-default-rtdb.firebaseio.com",
             storageBucket: "brega-system.firebasestorage.app",
-            messagingSenderId: "197985418350",
             appId: "1:197985418350:web:09c8497e8d3c810f8dfa7f"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const user = localStorage.getItem("currentUser") || "40366";
         let allTanks = [];
-        let allLogs = [];
+
+        window.toggleMenu = () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
 
         onValue(ref(db, 'tanks'), (s) => {
-            const data = s.val();
-            if (data) { allTanks = Object.values(data); draw(); }
+            const data = s.val(); if (data) { allTanks = Object.values(data); draw(); }
         });
 
         onValue(ref(db, 'logs'), (s) => {
-            const data = s.val();
-            if (data) { 
-                allLogs = Object.values(data).reverse(); 
-                updateLogs(); 
+            const data = s.val(); if (data) { 
+                const logs = Object.values(data).reverse();
+                document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-LY');
+                document.getElementById('logsBody').innerHTML = logs.map(l => `
+                    <tr><td>${l.time}</td><td>${l.tank}</td><td style="color:green">+${l.in}</td><td style="color:red">-${l.out}</td><td style="font-weight:bold">${l.total.toLocaleString()}</td><td>${l.user}</td></tr>
+                `).join('');
             }
         });
 
@@ -118,16 +124,10 @@
             const g = document.getElementById('tanksGrid'); g.innerHTML = '';
             let filtered = (user === "36640") ? allTanks.filter(t => t.id === 2) : allTanks;
             document.getElementById('userRole').innerText = (user === "36640") ? "مشرف خزان 2" : "المدير العام";
-
             filtered.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
-                g.innerHTML += `
-                    <div class="tank-card" onclick="openEdit(${t.id})">
-                        <h3>${t.name}</h3>
-                        <div class="tank-vis"><div class="fuel" style="height:${p}%"></div></div>
-                        <div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div>
-                        <small>${p.toFixed(1)}%</small>
-                    </div>`;
+                let c = p < 25 ? "var(--err)" : (p <= 75 ? "#f59e0b" : "var(--ok)");
+                g.innerHTML += `<div class="tank-card" onclick="openEdit(${t.id})"><h3>${t.name}</h3><div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div><div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div><small>${p.toFixed(1)}%</small></div>`;
             });
         }
 
@@ -135,47 +135,21 @@
             const idx = allTanks.findIndex(x => x.id === window.curId);
             const inV = parseFloat(document.getElementById('inQ').value) || 0;
             const outV = parseFloat(document.getElementById('outQ').value) || 0;
-            
-            const newQty = Math.round(allTanks[idx].qty + inV - outV);
-            allTanks[idx].qty = Math.max(0, newQty);
-
-            const log = {
-                time: new Date().toLocaleString('ar-LY'),
-                tank: allTanks[idx].name,
-                in: inV,
-                out: outV,
-                total: allTanks[idx].qty, // القيمة التراكمية
-                user: user
-            };
-
-            push(ref(db, 'logs'), log);
+            allTanks[idx].qty = Math.max(0, Math.round(allTanks[idx].qty + inV - outV));
+            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tank: allTanks[idx].name, in: inV, out: outV, total: allTanks[idx].qty, user: user });
             set(ref(db, 'tanks'), allTanks).then(() => closeEdit());
         }
 
-        function updateLogs() {
-            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-LY');
-            document.getElementById('logsBody').innerHTML = allLogs.map(l => `
-                <tr>
-                    <td>${l.time}</td>
-                    <td>${l.tank}</td>
-                    <td style="color:green">+${l.in}</td>
-                    <td style="color:red">-${l.out}</td>
-                    <td style="font-weight:bold">${l.total.toLocaleString()}</td>
-                    <td>${l.user}</td>
-                </tr>
-            `).join('');
-        }
-
         window.downloadPDF = () => {
-            html2canvas(document.getElementById('pdf-area'), { scale: 3 }).then(canvas => {
+            html2canvas(document.getElementById('pdf-area'), { scale: 2 }).then(canvas => {
                 const img = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
                 pdf.addImage(img, 'PNG', 0, 10, 210, (canvas.height * 210) / canvas.width);
-                pdf.save("تقرير_البريقة.pdf");
+                pdf.save("تقرير.pdf");
             });
         }
 
+        window.logout = () => { localStorage.clear(); location.replace('index.html'); }
         window.openEdit = (id) => { window.curId = id; document.getElementById('editModal').style.display = 'flex'; }
         window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; }
