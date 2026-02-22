@@ -8,109 +8,112 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { 
-            --primary: #004a99; --primary-dark: #003366; --bg: #f1f5f9; 
+            --primary: #004a99; --primary-dark: #003366; --bg: #f4f7fa; 
             --danger: #ef4444; --warning: #f59e0b; --success: #10b981; 
-            --tank-color: #e67e22; /* لون الوقود البرتقالي كما في الصورة */
+            --fuel-color: #f39c12; /* اللون البرتقالي المماثل للصورة */
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
-        /* الهيدر مع الشعار في المنتصف */
+        /* الهيدر المحسن */
         .header-container {
-            background: white; padding: 25px 5%; text-align: center;
-            border-bottom: 4px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: white; padding: 20px 5%; text-align: center;
+            border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             position: relative;
         }
-        .header-logo { width: 110px; height: auto; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
-        .header-title { margin: 0; font-size: 1.6rem; color: var(--primary); font-weight: 800; }
+        .header-logo { width: 100px; height: auto; margin-bottom: 5px; }
+        .header-title { margin: 5px 0; font-size: 1.5rem; color: var(--primary); font-weight: bold; }
 
-        /* زر الخيارات من اليمين */
         .menu-btn { 
             position: absolute; right: 20px; top: 20px;
             background: white; border: 2px solid var(--primary); color: var(--primary); 
             padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
         }
 
-        /* شبكة الخزانات: 4 في الصف */
+        /* الشبكة: 4 خزانات في الصف */
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 
-        @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 1200px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 650px) { .grid { grid-template-columns: 1fr; } }
 
-        /* تصميم كرت الخزان الجديد */
+        /* كرت الخزان المطور (نفس الصورة) */
         .tank-card { 
-            background: white; border-radius: 15px; padding: 20px; text-align: center; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
-            border: 1px solid #e2e8f0;
+            background: white; border-radius: 12px; padding: 20px; text-align: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
+            border: 1px solid #ebf0f5; position: relative;
         }
         .tank-card:hover { transform: translateY(-5px); }
 
-        .temp-badge { font-size: 0.85rem; color: var(--primary); font-weight: bold; text-align: left; margin-bottom: 5px; }
-        .tank-name { font-size: 1.2rem; font-weight: bold; margin: 10px 0; color: #334155; }
+        .temp-text { font-size: 0.9rem; color: var(--primary); font-weight: bold; text-align: left; position: absolute; top: 15px; left: 15px; }
+        .tank-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; color: #2c3e50; }
 
-        /* شكل الخزان العريض */
-        .tank-visual-box {
-            width: 100%; height: 100px; margin: 15px 0;
-            position: relative; display: flex; align-items: center; justify-content: center;
+        /* رسم الخزان الأسطواني بالـ CSS */
+        .tank-wrapper {
+            width: 160px; height: 100px; margin: 20px auto;
+            position: relative; border: 3px solid #34495e; border-radius: 10px;
+            background: #fff; overflow: hidden;
         }
-        .tank-shape {
-            width: 140px; height: 80px; border: 3px solid #334155;
-            border-radius: 15px; position: relative; overflow: hidden;
-            background: #fff; z-index: 1;
+        /* الجزء العلوي (الغطاء) */
+        .tank-wrapper::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 10px;
+            background: #ecf0f1; border-bottom: 2px solid #34495e; z-index: 3;
         }
-        .fuel-level {
-            position: absolute; bottom: 0; width: 100%;
-            background: var(--tank-color); transition: height 0.5s ease;
+        /* السلم (Ladder) */
+        .tank-ladder {
+            position: absolute; left: 50%; top: 10px; transform: translateX(-50%);
+            width: 15px; height: 90px; border-left: 2px solid #34495e; border-right: 2px solid #34495e;
+            z-index: 4; background: repeating-linear-gradient(transparent, transparent 8px, #34495e 8px, #34495e 10px);
         }
-        /* خطوط السلم/التدريج فوق الخزان */
-        .tank-shape::after {
-            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 2px; height: 100%; background: rgba(0,0,0,0.1); z-index: 2;
+        /* مستوى الوقود */
+        .fuel-fill {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: var(--fuel-color); transition: height 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            z-index: 2;
         }
 
-        .qty-display { font-size: 1.6rem; font-weight: 900; color: var(--primary-dark); margin: 10px 0; }
+        .qty-label { font-size: 0.8rem; color: #7f8c8d; margin-top: 10px; display: block; text-align: right; padding-right: 10%; }
+        .qty-val { font-size: 1.8rem; font-weight: 900; color: #2c3e50; margin: 5px 0; }
         
-        /* شريط النسبة المئوية السفلي */
-        .progress-container { background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 15px; }
-        .progress-fill { height: 100%; background: var(--tank-color); transition: width 0.5s ease; }
-        .percentage-text { font-size: 0.85rem; color: #64748b; margin-top: 5px; font-weight: 600; }
+        /* شريط النسبة السفلي */
+        .bar-container { background: #eee; height: 6px; border-radius: 3px; margin: 15px 10%; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--fuel-color); transition: width 1s ease; }
+        .percent-label { font-size: 0.85rem; color: #95a5a6; font-weight: bold; }
 
-        /* القائمة الجانبية (بدون كلمة القائمة الرئيسية) */
+        /* القائمة الجانبية */
         .sidebar {
-            position: fixed; top: 0; right: -300px; width: 270px; height: 100%;
+            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
             background: white; z-index: 1001; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
         }
         .sidebar.active { right: 0; }
-        .sidebar-header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #eee; }
-        .nav-item { padding: 15px 25px; display: block; color: var(--primary); font-weight: 600; cursor: pointer; text-align: right; text-decoration: none; }
-        .nav-item:hover { background: #f0f7ff; }
-        .logout-item { color: var(--danger); margin-top: auto; border-top: 1px solid #eee; }
+        .sidebar-header { padding: 40px; text-align: center; border-bottom: 1px solid #eee; }
+        .nav-link { padding: 15px 25px; display: block; color: var(--primary); font-weight: bold; text-decoration: none; text-align: right; cursor: pointer; }
+        .nav-link:hover { background: #f8fbff; }
+        .logout { color: var(--danger); border-top: 1px solid #eee; margin-top: auto; }
+        
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1000; }
         .overlay.active { display: block; }
 
         /* المودال */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
-        .m-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 15px; }
-        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        .update-btn { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; }
+        .m-box { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 15px; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box; font-size: 1rem; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header class="header-container">
-        <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
+        <button class="menu-btn" onclick="openNav()">خيارات</button>
         <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'">
         <h1 class="header-title">شركة البريقة لتسويق النفط</h1>
     </header>
 
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    <div class="overlay" id="overlay" onclick="closeNav()"></div>
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <img src="./Logo.png.PNG" style="width: 80px;" onerror="this.src='Logo.png'">
-        </div>
-        <div class="nav-item" onclick="toggleMenu()">واجهة الخزانات</div>
-        <div class="nav-item" onclick="openLogs(); toggleMenu()">كشف الحركات</div>
-        <div class="nav-item logout-item" onclick="logout()">تسجيل الخروج</div>
+        <div class="sidebar-header"><img src="./Logo.png.PNG" width="80" onerror="this.src='Logo.png'"></div>
+        <div class="nav-link" onclick="closeNav()">واجهة الخزانات</div>
+        <div class="nav-link" onclick="openLogs()">كشف الحركات</div>
+        <div class="nav-link logout" onclick="logout()">تسجيل الخروج</div>
     </div>
 
     <div class="container">
@@ -118,13 +121,13 @@
     </div>
 
     <div id="editModal" class="modal">
-        <div class="m-content">
-            <h3 id="mTankTitle" style="text-align:center;">تحديث البيانات</h3>
-            <input type="number" id="inQ" placeholder="وارد (+)">
-            <input type="number" id="outQ" placeholder="منصرف (-)">
-            <input type="number" id="tempQ" placeholder="الحرارة °C" step="0.1">
-            <button class="update-btn" onclick="save()">حفظ التغييرات</button>
-            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#94a3b8; margin-top:10px; cursor:pointer">إلغاء</button>
+        <div class="m-box">
+            <h3 style="text-align:center; margin-top:0">تحديث كميات الخزان</h3>
+            <label>كمية واردة (+)</label><input type="number" id="inQ" placeholder="0">
+            <label>كمية منصرفة (-)</label><input type="number" id="outQ" placeholder="0">
+            <label>الحرارة (°C)</label><input type="number" id="tempQ" step="0.1" placeholder="25.0">
+            <button class="btn-save" onclick="saveData()">تحديث وحفظ</button>
+            <button onclick="closeEdit()" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer">إلغاء</button>
         </div>
     </div>
 
@@ -142,53 +145,55 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const user = localStorage.getItem("currentUser") || "40366";
         let allTanks = [];
 
-        window.toggleMenu = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-        }
+        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
 
         onValue(ref(db, 'tanks'), (snap) => {
             allTanks = Object.values(snap.val() || {});
-            const g = document.getElementById('tanksGrid');
-            g.innerHTML = '';
+            const container = document.getElementById('tanksGrid');
+            container.innerHTML = '';
 
             allTanks.forEach(t => {
-                const p = (t.qty / t.cap) * 100;
-                g.innerHTML += `
+                const percent = (t.qty / t.cap) * 100;
+                container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div class="temp-badge">${t.temp}°C</div>
+                        <div class="temp-text">${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
-                        <div class="tank-visual-box">
-                            <div class="tank-shape">
-                                <div class="fuel-level" style="height:${p}%"></div>
-                            </div>
+                        <div class="tank-wrapper">
+                            <div class="tank-ladder"></div>
+                            <div class="fuel-fill" style="height:${percent}%"></div>
                         </div>
-                        <div class="qty-display">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="progress-container">
-                            <div class="progress-fill" style="width:${p}%"></div>
+                        <span class="qty-label">QTY</span>
+                        <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width:${percent}%"></div>
                         </div>
-                        <div class="percentage-text">${p.toFixed(1)}% ممتلئ</div>
+                        <div class="percent-label">${percent.toFixed(1)}% ممتلئ</div>
                     </div>`;
             });
         });
 
-        window.openEdit = (id) => { window.currentId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
         window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
         
-        window.save = () => {
-            const idx = allTanks.findIndex(x => x.id === window.currentId);
-            const inV = parseFloat(document.getElementById('inQ').value) || 0;
-            const outV = parseFloat(document.getElementById('outQ').value) || 0;
-            const tempV = parseFloat(document.getElementById('tempQ').value);
+        window.saveData = () => {
+            const idx = allTanks.findIndex(x => x.id === window.currId);
+            const inVal = parseFloat(document.getElementById('inQ').value) || 0;
+            const outVal = parseFloat(document.getElementById('outQ').value) || 0;
+            const tempVal = parseFloat(document.getElementById('tempQ').value);
 
-            allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inV - outV));
-            if(!isNaN(tempV)) allTanks[idx].temp = tempV;
+            allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
+            if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
 
-            set(ref(db, 'tanks'), allTanks).then(closeEdit);
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                closeEdit();
+                document.getElementById('inQ').value = '';
+                document.getElementById('outQ').value = '';
+            });
         }
+
         window.logout = () => { localStorage.clear(); window.location.replace("index.html"); }
     </script>
 </body>
