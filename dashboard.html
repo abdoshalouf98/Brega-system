@@ -4,73 +4,120 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم - شركة البريقة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { --p: #004a99; --s: #002d5d; --bg: #f1f5f9; --ok: #10b981; --warn: #f59e0b; --err: #ef4444; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; direction: rtl; }
-        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
-        .out-btn { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; direction: rtl; color: #1e293b; }
+        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .btns-group { display: flex; gap: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; }
         .container { padding: 30px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .tank-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); cursor: pointer; }
-        .tank-vis { width: 80px; height: 120px; border: 3px solid #334; margin: 15px auto; position: relative; border-radius: 10px; overflow: hidden; }
-        .fuel { position: absolute; bottom: 0; width: 100%; transition: 1s; }
-        .qty { font-size: 1.4rem; font-weight: bold; color: var(--s); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .m-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .update-btn { background: var(--ok); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #loading { position: fixed; top: 10px; left: 10px; background: var(--warn); color: white; padding: 5px 15px; border-radius: 20px; display: none; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .tank-card { background: white; border-radius: 24px; padding: 25px; text-align: center; position: relative; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .temp-tag { position: absolute; top: 20px; left: 20px; background: #f8fafc; padding: 6px 12px; border-radius: 12px; font-weight: 800; border: 1px solid #e2e8f0; }
+        .tank-vis { width: 100px; height: 140px; border: 4px solid #334155; margin: 20px auto; position: relative; border-radius: 15px; background: #f1f5f9; overflow: hidden; }
+        .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
+        .qty { font-size: 1.6rem; font-weight: 800; color: var(--s); }
+        .p-bar { background: #f1f5f9; height: 8px; border-radius: 10px; width: 80%; margin: 15px auto; overflow: hidden; }
+        .p-fill { height: 100%; transition: 1s; }
+        
+        /* Modal Styles */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
+        .m-content { background: white; width: 95%; max-width: 600px; padding: 30px; border-radius: 24px; max-height: 80vh; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
+        th { background: #f8fafc; color: var(--s); }
+        input { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
+        .pdf-btn { background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        .update-btn { background: var(--ok); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="loading">جاري المزامنة...</div>
-
     <header class="header">
-        <div><h1>شركة البريقة</h1><small id="userRole"></small></div>
-        <button onclick="logout()" class="out-btn">خروج</button>
+        <div><h1>منظومة البريقة</h1><small id="userRole"></small></div>
+        <div class="btns-group">
+            <button onclick="openLogs()" class="nav-btn">📊 كشف الحركات</button>
+            <button onclick="logout()" class="nav-btn">خروج 🔄</button>
+        </div>
     </header>
 
     <div class="container"><div class="grid" id="tanksGrid"></div></div>
 
     <div id="editModal" class="modal">
-        <div class="m-content">
-            <h3 id="mTankTitle">تحديث البيانات</h3>
+        <div class="m-content" style="max-width: 400px;">
+            <h3 id="mTankTitle" style="text-align:center;">تحديث البيانات</h3>
             <label>كمية داخلة (+)</label><input type="number" id="inQ" placeholder="0">
             <label>كمية خارجة (-)</label><input type="number" id="outQ" placeholder="0">
-            <label>درجة الحرارة</label><input type="number" id="tempQ" step="0.1">
-            <button class="update-btn" onclick="save()">حفظ وتحديث للجميع</button>
-            <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; color:gray; cursor:pointer">إلغاء</button>
+            <label>درجة الحرارة (°C)</label><input type="number" id="tempQ" step="0.1">
+            <button class="update-btn" onclick="save()">تأكيد وحفظ</button>
+            <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; color:#94a3b8; cursor:pointer">إلغاء</button>
         </div>
     </div>
 
-    <script>
-        const BIN_ID = "65d8c362dc74654018aa7a2b"; // هذا مخزن بيانات تجريبي
-        const API_KEY = "$2a$10$Your_Fake_Key_Here"; // سيعمل الكود للعرض
-        let currentId = null;
-        let data = [];
-        const user = localStorage.getItem("currentUser");
+    <div id="logsModal" class="modal">
+        <div class="m-content">
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <h3>سجل حركات اليوم</h3>
+                <button onclick="downloadPDF()" class="pdf-btn">حفظ كـ PDF 📄</button>
+            </div>
+            <table id="logsTable">
+                <thead>
+                    <tr>
+                        <th>التوقيت</th>
+                        <th>الخزان</th>
+                        <th>الوارد</th>
+                        <th>المنصرف</th>
+                        <th>المستخدم</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+            <button onclick="closeLogs()" style="width:100%; border:none; background:none; margin-top:20px; color:#94a3b8; cursor:pointer">إغلاق</button>
+        </div>
+    </div>
 
-        // دالة لجلب البيانات من السحاب (Cloud)
-        async function loadCloudData() {
-            document.getElementById('loading').style.display = 'block';
-            try {
-                // ملاحظة: للتجربة سنستخدم الذاكرة المحلية أولاً، وإذا أردت ربط حقيقي ستحتاج مفتاح API
-                const saved = localStorage.getItem("brega_global_data");
-                if(saved) {
-                    data = JSON.parse(saved);
-                } else {
-                    for(let i=1; i<=8; i++) data.push({id:i, name:"خزان "+i, qty:500000, cap:1000000, temp:25});
-                }
-                draw();
-            } catch (e) { console.log("خطأ في الجلب"); }
-            document.getElementById('loading').style.display = 'none';
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        function draw() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
+            authDomain: "brega-system.firebaseapp.com",
+            projectId: "brega-system",
+            databaseURL: "https://brega-system-default-rtdb.firebaseio.com",
+            storageBucket: "brega-system.firebasestorage.app",
+            messagingSenderId: "197985418350",
+            appId: "1:197985418350:web:09c8497e8d3c810f8dfa7f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const user = localStorage.getItem("currentUser") || "مجهول";
+        let allTanks = [];
+        let allLogs = [];
+
+        // جلب بيانات الخزانات
+        onValue(ref(db, 'tanks'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) { allTanks = Object.values(data); draw(); }
+        });
+
+        // جلب سجل الحركات
+        onValue(ref(db, 'logs'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                allLogs = Object.values(data).reverse(); // عرض الأحدث أولاً
+                updateLogsTable();
+            }
+        });
+
+        window.draw = function() {
             const g = document.getElementById('tanksGrid');
             g.innerHTML = '';
-            let displayData = (user === "36640") ? data.filter(t => t.id === 2) : data;
+            let displayData = (user === "36640") ? allTanks.filter(t => t.id === 2) : allTanks;
             document.getElementById('userRole').innerText = (user === "36640") ? "مشرف الخزان 2" : "المدير العام";
 
             displayData.forEach(t => {
@@ -78,44 +125,72 @@
                 let c = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div style="text-align:left">🌡️ ${t.temp}°C</div>
-                        <h3>${t.name}</h3>
+                        <div class="temp-tag">${t.temp}°C</div>
+                        <h3 style="margin-top:35px">${t.name}</h3>
                         <div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div>
-                        <div class="qty">${t.qty.toLocaleString()} لتر</div>
+                        <div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div>
+                        <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${c}"></div></div>
                         <small>${p.toFixed(1)}%</small>
                     </div>`;
             });
         }
 
-        function openEdit(id) {
-            currentId = id;
-            const t = data.find(x => x.id === id);
-            document.getElementById('mTankTitle').innerText = t.name;
-            document.getElementById('tempQ').value = t.temp;
-            document.getElementById('editModal').style.display = 'flex';
+        window.save = function() {
+            const tIndex = allTanks.findIndex(x => x.id === window.currentId);
+            const inVal = parseFloat(document.getElementById('inQ').value) || 0;
+            const outVal = parseFloat(document.getElementById('outQ').value) || 0;
+            const tempVal = parseFloat(document.getElementById('tempQ').value);
+
+            if (inVal === 0 && outVal === 0 && isNaN(tempVal)) return;
+
+            // تحديث الخزان
+            allTanks[tIndex].qty = Math.min(allTanks[tIndex].cap, Math.max(0, allTanks[tIndex].qty + inVal - outVal));
+            if(!isNaN(tempVal)) allTanks[tIndex].temp = tempVal;
+
+            // تسجيل الحركة في Firebase
+            const newLog = {
+                time: new Date().toLocaleString('ar-LY'),
+                tankName: allTanks[tIndex].name,
+                added: inVal,
+                subbed: outVal,
+                user: user
+            };
+            push(ref(db, 'logs'), newLog);
+
+            // حفظ التحديث في الخزانات
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                closeEdit();
+                document.getElementById('inQ').value = "";
+                document.getElementById('outQ').value = "";
+            });
         }
 
-        function closeEdit() { document.getElementById('editModal').style.display = 'none'; }
-
-        async function save() {
-            const index = data.findIndex(x => x.id === currentId);
-            const i = parseFloat(document.getElementById('inQ').value) || 0;
-            const o = parseFloat(document.getElementById('outQ').value) || 0;
-            
-            data[index].qty = Math.min(data[index].cap, Math.max(0, data[index].qty + i - o));
-            data[index].temp = parseFloat(document.getElementById('tempQ').value) || data[index].temp;
-
-            // حفظ في الذاكرة لكي تظهر عند العودة
-            localStorage.setItem("brega_global_data", JSON.stringify(data));
-            
-            draw();
-            closeEdit();
-            alert("تم التحديث! ملاحظة: لكي يراها غيرك من جهاز آخر، نحتاج لربط سيرفر Firebase مجاني.");
+        function updateLogsTable() {
+            const body = document.getElementById('logsBody');
+            body.innerHTML = allLogs.map(l => `
+                <tr>
+                    <td>${l.time}</td>
+                    <td>${l.tankName}</td>
+                    <td style="color:green">+${l.added}</td>
+                    <td style="color:red">-${l.subbed}</td>
+                    <td>${l.user}</td>
+                </tr>
+            `).join('');
         }
 
-        function logout() { window.location.replace("index.html"); }
+        window.downloadPDF = function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("كشف حركات الخزانات - شركة البريقة", 105, 10, { align: "center" });
+            doc.autoTable({ html: '#logsTable', theme: 'grid', styles: { font: 'Arial', halign: 'center' } });
+            doc.save(`Brega_Report_${new Date().toLocaleDateString()}.pdf`);
+        }
 
-        window.onload = loadCloudData;
+        window.openEdit = (id) => { window.currentId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
+        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; }
+        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
+        window.logout = () => { window.location.replace("index.html"); }
     </script>
 </body>
 </html>
