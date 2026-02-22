@@ -3,74 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - منظومة البريقة</title>
+    <title>دخول - شركة البريقة</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: #004a99; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .login-card { 
-            background: white; 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-            width: 90%; 
-            max-width: 350px; 
-            text-align: center; 
-        }
-        h2 { color: #333; margin-bottom: 25px; }
-        input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 10px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-        }
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background: #004a99; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            margin-top: 10px;
-        }
-        button:hover { background: #003366; }
+        :root { --primary: #004a99; --secondary: #002d5d; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; direction: rtl; }
+        .login-card { background: white; padding: 35px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--primary); }
+        .logo { width: 110px; margin-bottom: 10px; }
+        h2 { color: var(--secondary); margin-bottom: 25px; font-size: 1.3rem; }
+        .input-group { text-align: right; margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 0.9rem; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; outline: none; transition: 0.3s; background: #fafafa; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,74,153,0.1); }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: var(--secondary); transform: translateY(-2px); }
+        .error-msg { color: #dc3545; font-size: 0.85rem; margin-top: 10px; display: none; }
+        .register-link { margin-top: 20px; font-size: 0.85rem; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
+        .register-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; }
+        .modal-content { background: white; width: 85%; max-width: 350px; margin: 15vh auto; padding: 25px; border-radius: 20px; position: relative; text-align: center; }
+        #strength-meter { height: 4px; background: #eee; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        #strength-bar { height: 100%; width: 0; transition: 0.3s; }
     </style>
 </head>
 <body>
-
     <div class="login-card">
-        <h2>تسجيل الدخول</h2>
-        <input type="text" id="uid" placeholder="اسم المستخدم (الرقم الوظيفي)">
-        <input type="password" id="ups" placeholder="كلمة السر">
-        <button onclick="login()">دخول</button>
+        <img src="Logo.png" alt="Logo" class="logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png'">
+        <h2>منظومة تتبع الخزانات</h2>
+        <div class="input-group"><label>الرقم الوظيفي</label><input type="text" id="username" placeholder="أدخل الرقم"></div>
+        <div class="input-group"><label>كلمة السر</label><input type="password" id="password" placeholder="أدخل كلمة السر"></div>
+        <button onclick="login()">تسجيل الدخول</button>
+        <p id="errorMessage" class="error-msg"></p>
+        <div class="register-link">ليس لديك حساب؟ <a href="#" onclick="document.getElementById('registerModal').style.display='block'">طلب تسجيل جديد</a></div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span style="float:left; cursor:pointer;" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
+            <h3 style="color:var(--primary)">طلب حساب جديد</h3>
+            <input type="text" id="newUsername" placeholder="الرقم الوظيفي" style="margin-bottom:10px">
+            <input type="password" id="newPassword" placeholder="كلمة السر" oninput="checkStrength(this.value)">
+            <div id="strength-meter"><div id="strength-bar"></div></div>
+            <button style="background:#28a745; margin-top:15px" onclick="sendEmail()">إرسال للإدارة</button>
+        </div>
     </div>
 
     <script>
         function login() {
-            const id = document.getElementById('uid').value;
-            const ps = document.getElementById('ups').value;
-
-            // التحقق من البيانات (المدير العام ومشرف الخزان 2)
-            if((id === "40366" && ps === "123") || (id === "36640" && ps === "456")) {
-                localStorage.setItem("currentUser", id);
-                location.replace('dashboard.html');
-            } else { 
-                alert("خطأ في اسم المستخدم أو كلمة السر!"); 
-            }
+            const u = document.getElementById('username').value, p = document.getElementById('password').value;
+            if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
+                localStorage.setItem("currentUser", u); window.location.href = "dashboard.html";
+            } else { document.getElementById('errorMessage').style.display = "block"; document.getElementById('errorMessage').innerText = "خطأ في البيانات!"; }
+        }
+        function checkStrength(p) {
+            let s = p.length > 8 ? 100 : (p.length > 4 ? 66 : 33);
+            const bar = document.getElementById('strength-bar');
+            bar.style.width = s + "%"; bar.style.backgroundColor = s === 100 ? "green" : (s === 66 ? "orange" : "red");
         }
     </script>
-
 </body>
 </html>
