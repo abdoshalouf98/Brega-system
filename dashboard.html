@@ -27,7 +27,6 @@
             color: var(--text-main); 
         }
 
-        /* Header Professional Style */
         .header { 
             background: white; 
             color: var(--primary); 
@@ -62,7 +61,6 @@
         .logout-btn { border-color: var(--danger); color: var(--danger); }
         .logout-btn:hover { background: var(--danger); color: white; }
 
-        /* Grid & Cards */
         .container { padding: 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
 
@@ -78,42 +76,20 @@
             cursor: pointer;
         }
 
-        .tank-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
-        }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
 
         .temp-tag { 
-            position: absolute; 
-            top: 15px; 
-            left: 15px; 
-            background: #f1f5f9; 
-            padding: 5px 12px; 
-            border-radius: 20px; 
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: var(--primary);
+            position: absolute; top: 15px; left: 15px; background: #f1f5f9; 
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; color: var(--primary);
         }
 
-        /* Modern Tank Visual */
         .tank-vis { 
-            width: 80px; 
-            height: 120px; 
-            border: 3px solid #334155; 
-            margin: 20px auto; 
-            position: relative; 
-            border-radius: 12px; 
-            background: #f8fafc; 
-            overflow: hidden; 
+            width: 80px; height: 120px; border: 3px solid #334155; margin: 20px auto; 
+            position: relative; border-radius: 12px; background: #f8fafc; overflow: hidden; 
             box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
         }
 
-        .fuel { 
-            position: absolute; 
-            bottom: 0; 
-            width: 100%; 
-            transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
+        .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
 
         .qty { font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); margin-top: 10px; }
         
@@ -121,24 +97,13 @@
         .p-bar { background: #e2e8f0; height: 6px; border-radius: 10px; overflow: hidden; margin-bottom: 5px; }
         .p-fill { height: 100%; transition: width 1s ease; }
 
-        /* Modals */
         .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(4px); 
-            z-index: 1000; 
-            align-items: center; 
-            justify-content: center; 
+            display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; 
         }
 
         .m-content { 
-            background: white; 
-            width: 90%; 
-            max-width: 450px; 
-            padding: 35px; 
-            border-radius: 24px; 
+            background: white; width: 90%; max-width: 450px; padding: 35px; border-radius: 24px; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
 
@@ -146,21 +111,16 @@
         input { 
             width: 100%; padding: 12px; border: 2px solid #e2e8f0; 
             border-radius: 10px; margin-bottom: 20px; box-sizing: border-box; 
-            transition: border-color 0.3s;
         }
-        input:focus { border-color: var(--primary); outline: none; }
 
         .update-btn { 
-            background: var(--primary); color: white; border: none; 
-            padding: 14px; width: 100%; border-radius: 10px; 
-            font-weight: bold; cursor: pointer; font-size: 1rem;
+            background: var(--primary); color: white; border: none; padding: 14px; width: 100%; 
+            border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem;
         }
 
-        /* Table Style */
         #logsTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
         #logsTable th { background: #f8fafc; padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0; }
         #logsTable td { padding: 12px; border-bottom: 1px solid #f1f5f9; }
-
     </style>
 </head>
 <body>
@@ -184,11 +144,11 @@
         <div class="m-content">
             <h3 id="mTankTitle" style="text-align:center; margin-top:0;">تعديل بيانات الخزان</h3>
             <label>كمية واردة</label>
-            <input type="number" id="inQ" placeholder="أدخل الكمية المضافة">
+            <input type="number" id="inQ" placeholder="الكمية المضافة">
             <label>كمية منصرفة</label>
-            <input type="number" id="outQ" placeholder="أدخل الكمية المسحوبة">
+            <input type="number" id="outQ" placeholder="الكمية المسحوبة">
             <label>درجة الحرارة الحاليّة (°C)</label>
-            <input type="number" id="tempQ" step="0.1">
+            <input type="number" id="tempQ" step="0.1" placeholder="درجة الحرارة">
             <button class="update-btn" onclick="save()">تحديث البيانات</button>
             <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:15px; color:#94a3b8; cursor:pointer">إلغاء العملية</button>
         </div>
@@ -286,8 +246,6 @@
             const outVal = parseFloat(document.getElementById('outQ').value) || 0;
             const tempVal = parseFloat(document.getElementById('tempQ').value);
 
-            if (inVal < 0 || outVal < 0) { alert("يرجى إدخال قيم صحيحة"); return; }
-
             allTanks[tIndex].qty = Math.min(allTanks[tIndex].cap, Math.max(0, allTanks[tIndex].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[tIndex].temp = tempVal;
 
@@ -304,6 +262,7 @@
                 closeEdit();
                 document.getElementById('inQ').value = "";
                 document.getElementById('outQ').value = "";
+                document.getElementById('tempQ').value = "";
             });
         }
 
