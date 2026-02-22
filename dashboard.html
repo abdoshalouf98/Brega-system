@@ -3,33 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - شركة البريقة</title>
+    <title>منظومة البريقة - لوحة التحكم</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --p: #004a99; --s: #002d5d; --bg: #f1f5f9; --ok: #10b981; --warn: #f59e0b; --err: #ef4444; }
+        * { box-sizing: border-box; transition: all 0.3s ease; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
-        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .nav-btn { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-        .container { padding: 30px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
-        .tank-vis { width: 90px; height: 130px; border: 4px solid #334155; margin: 15px auto; position: relative; border-radius: 12px; background: #f1f5f9; overflow: hidden; }
+        
+        /* هيدر متجاوب */
+        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 1000; }
+        .nav-btn { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        
+        /* شبكة الخزانات - تكبر وتصغر تلقائياً */
+        .container { padding: 20px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .tank-card { background: white; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; }
+        .tank-vis { width: 80px; height: 120px; border: 3px solid #334155; margin: 15px auto; position: relative; border-radius: 10px; background: #eee; overflow: hidden; }
         .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
-        .qty { font-size: 1.5rem; font-weight: 800; color: var(--s); }
-        #pdf-area { background: white; padding: 30px; color: black; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; direction: rtl; }
-        th, td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 11pt; }
+        
+        /* منطقة التقرير للـ PDF */
+        #pdf-area { background: white; padding: 20px; color: black; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 11pt; }
         th { background: #f2f2f2; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
-        .m-content { background: white; width: 95%; max-width: 850px; padding: 25px; border-radius: 20px; max-height: 85vh; overflow-y: auto; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 2000; align-items: center; justify-content: center; }
+        .m-content { background: white; width: 90%; max-width: 800px; padding: 25px; border-radius: 20px; max-height: 85vh; overflow-y: auto; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div><h2 style="margin:0">منظومة البريقة</h2><small id="userRole"></small></div>
+        <div><h2 style="margin:0">منظومة البريقة الذكية</h2><small id="userRole"></small></div>
         <div>
             <button onclick="openLogs()" class="nav-btn">📊 كشف الحركات</button>
             <button onclick="location.replace('index.html')" class="nav-btn">خروج</button>
@@ -40,29 +47,30 @@
 
     <div id="editModal" class="modal">
         <div class="m-content" style="max-width: 400px;">
-            <h3>تعديل الكميات</h3>
-            <label>وارد (+)</label><input type="number" id="inQ">
-            <label>منصرف (-)</label><input type="number" id="outQ">
+            <h3 style="text-align:center">تعديل كميات الخزان</h3>
+            <label>وارد (+)</label><input type="number" id="inQ" placeholder="0">
+            <label>منصرف (-)</label><input type="number" id="outQ" placeholder="0">
             <label>الحرارة</label><input type="number" id="tempQ" step="0.1">
-            <button onclick="save()" style="width:100%; padding:15px; background:var(--ok); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">حفظ</button>
+            <button onclick="save()" style="width:100%; padding:15px; background:var(--ok); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold;">تأكيد وحفظ</button>
             <button onclick="closeEdit()" style="width:100%; background:none; border:none; margin-top:10px; color:gray; cursor:pointer;">إلغاء</button>
         </div>
     </div>
 
     <div id="logsModal" class="modal">
         <div class="m-content">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin:0">سجل العمليات</h2>
-                <button onclick="downloadPDF()" id="pdfBtn" style="background:#dc2626; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">حفظ PDF 📄</button>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin:0">سجل حركة المخزون</h3>
+                <button onclick="downloadPDF()" id="pdfBtn" style="background:var(--err); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer;">حفظ PDF (عربي) 📄</button>
             </div>
+            
             <div id="pdf-area">
-                <div style="text-align:center; border-bottom: 2px solid #004a99; padding-bottom: 10px; margin-bottom: 20px;">
-                    <h2 style="margin:0; color:#004a99;">شركة البريقة لتسويق النفط</h2>
-                    <p>كشف حركة المخزون - <span id="currentDate"></span></p>
+                <div style="text-align:center; border-bottom: 2px solid var(--p); padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2 style="margin:0; color:var(--p)">شركة البريقة لتسويق النفط</h2>
+                    <p>تقرير حركة الخزانات - <span id="reportDate"></span></p>
                 </div>
                 <table>
                     <thead>
-                        <tr><th>التاريخ والوقت</th><th>الخزان</th><th>وارد (+)</th><th>منصرف (-)</th><th>الإجمالي</th><th>الموظف</th></tr>
+                        <tr><th>التاريخ</th><th>الخزان</th><th>الوارد</th><th>المنصرف</th><th>الإجمالي</th><th>الموظف</th></tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
                 </table>
@@ -100,17 +108,12 @@
             const data = s.val();
             if (data) { 
                 allLogs = Object.values(data).reverse(); 
-                const lb = document.getElementById('logsBody');
-                if(lb) {
-                    lb.innerHTML = allLogs.map(l => `
-                        <tr>
-                            <td>${l.time}</td><td>${l.tank}</td>
-                            <td style="color:green">+${l.in.toLocaleString()}</td>
-                            <td style="color:red">-${l.out.toLocaleString()}</td>
-                            <td style="font-weight:bold">${l.total.toLocaleString()}</td>
-                            <td>${l.user}</td>
-                        </tr>`).join('');
-                }
+                document.getElementById('logsBody').innerHTML = allLogs.map(l => `
+                    <tr>
+                        <td>${l.time}</td><td>${l.tank}</td>
+                        <td style="color:green">+${l.in}</td><td style="color:red">-${l.out}</td>
+                        <td style="font-weight:bold">${l.total.toLocaleString()}</td><td>${l.user}</td>
+                    </tr>`).join('');
             }
         });
 
@@ -121,7 +124,6 @@
 
             filtered.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
-                // التنسيق اللوني بناءً على النسبة
                 let color = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
@@ -138,8 +140,9 @@
             const inV = parseFloat(document.getElementById('inQ').value) || 0;
             const outV = parseFloat(document.getElementById('outQ').value) || 0;
             const tmpV = parseFloat(document.getElementById('tempQ').value);
-            const newQty = Math.round(allTanks[idx].qty + inV - outV);
-            allTanks[idx].qty = Math.max(0, newQty);
+            const newTotal = Math.round(allTanks[idx].qty + inV - outV);
+
+            allTanks[idx].qty = Math.max(0, newTotal);
             if(!isNaN(tmpV)) allTanks[idx].temp = tmpV;
 
             push(ref(db, 'logs'), {
@@ -153,6 +156,8 @@
         }
 
         window.downloadPDF = () => {
+            const btn = document.getElementById('pdfBtn');
+            btn.innerText = "جاري التحميل...";
             html2canvas(document.getElementById('pdf-area'), { scale: 3 }).then(canvas => {
                 const img = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
@@ -160,13 +165,14 @@
                 const w = pdf.internal.pageSize.getWidth();
                 pdf.addImage(img, 'PNG', 0, 10, w, (canvas.height * w) / canvas.width);
                 pdf.save(`تقرير_البريقة_${new Date().toLocaleDateString()}.pdf`);
+                btn.innerText = "حفظ PDF (عربي) 📄";
             });
         }
 
         window.openEdit = (id) => { window.curId = id; document.getElementById('editModal').style.display = 'flex'; }
         window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
         window.openLogs = () => { 
-            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-LY');
+            document.getElementById('reportDate').innerText = new Date().toLocaleDateString('ar-LY');
             document.getElementById('logsModal').style.display = 'flex'; 
         }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
