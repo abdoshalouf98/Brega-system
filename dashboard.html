@@ -13,39 +13,40 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
         
-        /* الهيدر المعدل: الزر يميناً والشعار يساراً */
+        /* الهيدر: الشعار يميناً والخيارات يساراً */
         .header { 
             background: white; padding: 0.8rem 5%; display: flex; 
             justify-content: space-between; align-items: center; position: sticky; top: 0; 
             z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 3px solid var(--primary);
         }
 
-        /* زر الخيارات على اليمين */
+        /* الشعار والمعلومات على اليمين */
+        .header-info { display: flex; align-items: center; gap: 12px; order: 1; }
+        .header-logo { width: 50px; height: 50px; object-fit: contain; }
+
+        /* زر الخيارات على اليسار */
         .menu-btn { 
             background: white; border: 1.5px solid var(--primary); color: var(--primary); 
             padding: 8px 25px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
-            order: 1; /* يضمن بقاءه في المركز الأول جهة اليمين */
+            order: 2;
         }
         .menu-btn:hover { background: var(--primary); color: white; }
 
-        /* الشعار والمعلومات على اليسار */
-        .header-info { display: flex; align-items: center; gap: 12px; order: 2; text-align: left; }
-        .header-logo { width: 50px; height: 50px; object-fit: contain; }
-
-        /* القائمة الجانبية */
+        /* القائمة الجانبية (Drawer) تخرج من اليسار لتناسب موقع الزر */
         .sidebar {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
             background: white; z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
         }
-        .sidebar.active { right: 0; }
+        .sidebar.active { left: 0; }
+
         .sidebar-header { padding: 30px 20px; border-bottom: 1px solid #eee; text-align: center; }
         .nav-item { 
             padding: 15px 25px; display: block; color: var(--primary); text-decoration: none;
-            font-weight: 600; transition: 0.2s; cursor: pointer; border-right: 4px solid transparent;
+            font-weight: 600; transition: 0.2s; cursor: pointer; border-left: 4px solid transparent;
             text-align: right;
         }
-        .nav-item:hover { background: #f0f7ff; border-right-color: var(--primary); }
+        .nav-item:hover { background: #f0f7ff; border-left-color: var(--primary); }
         .sidebar-footer { padding: 20px; border-top: 1px solid #eee; margin-top: auto; }
         .logout-item { color: var(--danger); }
 
@@ -71,25 +72,26 @@
 <body>
 
     <header class="header">
-        <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
-
         <div class="header-info">
-            <div style="text-align: left;">
+            <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'" alt="Logo">
+            <div style="text-align: right;">
                 <h1 style="margin:0; font-size:1.1rem; color:var(--primary)">شركة البريقة</h1>
                 <div id="userRole" style="font-size:0.75rem; color:#64748b"></div>
             </div>
-            <img src="./Logo.png.PNG" class="header-logo" onerror="this.src='Logo.png'" alt="Logo">
         </div>
+
+        <button class="menu-btn" onclick="toggleMenu()">خيارات</button>
     </header>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="./Logo.png.PNG" style="width: 80px;" onerror="this.src='Logo.png'">
             <h3 style="color: var(--primary-dark); margin-top: 10px;">القائمة الرئيسية</h3>
         </div>
         <div class="sidebar-content">
-            <div class="nav-item" onclick="toggleMenu()">الصفحة الرئيسية (الخزانات)</div>
+            <div class="nav-item" onclick="toggleMenu()">الصفحة الرئيسية</div>
             <div class="nav-item" onclick="openLogs(); toggleMenu()">كشف الحركات</div>
         </div>
         <div class="sidebar-footer">
@@ -127,7 +129,7 @@
                 </thead>
                 <tbody id="logsBody"></tbody>
             </table>
-            <button onclick="closeLogs()" style="width:100%; background:none; border:none; margin-top:20px; color:var(--primary); cursor:pointer; font-weight:bold">إغلاق</button>
+            <button onclick="closeLogs()" style="width:100%; background:none; border:none; margin-top:20px; color:var(--primary); cursor:pointer; font-weight:bold">إلغاء</button>
         </div>
     </div>
 
@@ -174,7 +176,7 @@
         window.draw = function() {
             const g = document.getElementById('tanksGrid');
             g.innerHTML = '';
-            document.getElementById('userRole').innerText = "الموظف: " + user;
+            document.getElementById('userRole').innerText = "رقم الموظف: " + user;
 
             allTanks.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
@@ -185,7 +187,7 @@
 
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div style="font-size:0.8rem; color:var(--primary); font-weight:bold; text-align:left">${t.temp}°C</div>
+                        <div style="font-size:0.8rem; color:var(--primary); font-weight:bold; text-align:right">${t.temp}°C</div>
                         <h3 style="margin:10px 0">${t.name}</h3>
                         <div class="tank-vis">
                             <div class="fuel" style="height:${p}%; background:${color}"></div>
