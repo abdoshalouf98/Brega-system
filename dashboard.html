@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة البريقة - لوحة التحكم</title>
+    <title>لوحة التحكم - شركة البريقة</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -11,39 +11,35 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; overflow-x: hidden; }
         
         /* الهيدر مع زر القائمة */
-        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .menu-icon { cursor: pointer; display: flex; flex-direction: column; gap: 5px; margin-left: 20px; }
-        .menu-icon span { width: 25px; height: 3px; background: white; border-radius: 2px; }
+        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .menu-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 5px; margin-left: 20px; }
+        .menu-btn span { width: 25px; height: 3px; background: white; border-radius: 2px; }
 
-        /* القائمة الجانبية (Sidebar) */
-        .sidebar { position: fixed; right: -280px; top: 0; width: 280px; height: 100%; background: var(--s); color: white; transition: 0.3s; z-index: 2000; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.2); }
+        /* القائمة الجانبية Sidebar */
+        .sidebar { position: fixed; right: -280px; top: 0; width: 280px; height: 100%; background: var(--s); color: white; transition: 0.3s; z-index: 2000; padding-top: 60px; }
         .sidebar.active { right: 0; }
         .sidebar-item { padding: 15px 25px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); color: white; text-decoration: none; display: block; font-size: 1.1rem; }
         .sidebar-item:hover { background: var(--p); }
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1500; }
         .overlay.active { display: block; }
 
-        /* المحتوى والتبديل بين الصفحات */
+        /* التصميم الأساسي للبطاقات */
         .container { padding: 30px 5%; }
-        .section { display: none; }
-        .section.active { display: block; }
-
-        /* تصميم البطاقات (التصميم الأول) */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #e2e8f0; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .tank-card { background: white; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
         .tank-vis { width: 90px; height: 130px; border: 4px solid #334155; margin: 15px auto; position: relative; border-radius: 12px; background: #f1f5f9; overflow: hidden; }
         .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
         .qty { font-size: 1.5rem; font-weight: 800; color: var(--s); }
+        
+        /* الجداول والمودال */
+        #pdf-area { background: white; padding: 30px; color: black; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; direction: rtl; }
+        th, td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 11pt; }
+        th { background: #f2f2f2; }
 
-        /* تصميم الجدول للـ PDF */
-        #pdf-area { background: white; padding: 20px; border-radius: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background: #f8fafc; }
-
-        /* المودال */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 3000; align-items: center; justify-content: center; }
-        .m-content { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; }
+        .m-content { background: white; width: 95%; max-width: 850px; padding: 25px; border-radius: 20px; max-height: 85vh; overflow-y: auto; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
     </style>
 </head>
@@ -52,59 +48,61 @@
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <header class="header">
-        <div class="menu-icon" onclick="toggleMenu()">
+        <button class="menu-btn" onclick="toggleMenu()">
             <span></span><span></span><span></span>
-        </div>
-        <h2 style="margin:0">منظومة البريقة</h2>
+        </button>
+        <div><h2 style="margin:0">منظومة البريقة الذكية</h2></div>
     </header>
 
     <nav class="sidebar" id="sidebar">
-        <div class="sidebar-item" onclick="showSection('tanksSec')">الصفحة الرئيسية</div>
-        <div class="sidebar-item" onclick="showSection('logsSec')">كشف حركات الخزانات</div>
+        <div class="sidebar-item" onclick="toggleMenu()">الصفحة الرئيسية</div>
+        <div class="sidebar-item" onclick="openLogs(); toggleMenu();">كشف حركات الخزانات</div>
         <div class="sidebar-item" onclick="logout()" style="color: #ff8888; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px;">تسجيل الخروج</div>
     </nav>
 
     <div class="container">
-        <section id="tanksSec" class="section active">
-            <h3 id="userRole">...</h3>
-            <div class="grid" id="tanksGrid"></div>
-        </section>
+        <h3 id="userRole" style="margin-bottom: 20px; color: var(--s);">جارِ التحميل...</h3>
+        <div class="grid" id="tanksGrid"></div>
+    </div>
 
-        <section id="logsSec" class="section">
+    <div id="editModal" class="modal">
+        <div class="m-content" style="max-width: 400px;">
+            <h3 style="text-align:center">تحديث كمية الخزان</h3>
+            <label>وارد (+)</label><input type="number" id="inQ" placeholder="0">
+            <label>منصرف (-)</label><input type="number" id="outQ" placeholder="0">
+            <button style="background:var(--ok); width:100%; color:white; padding:15px; border:none; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="save()">حفظ البيانات</button>
+            <button onclick="closeEdit()" style="width:100%; background:none; border:none; margin-top:15px; color:gray; cursor:pointer;">إلغاء</button>
+        </div>
+    </div>
+
+    <div id="logsModal" class="modal">
+        <div class="m-content">
             <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>كشف حركات الخزانات</h3>
-                <button onclick="downloadPDF()" style="background:var(--err); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">تحميل كـ PDF</button>
+                <h2 style="margin:0">كشف حركات الخزانات</h2>
+                <button onclick="downloadPDF()" id="pdfBtn" style="background:var(--err); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer;">حفظ PDF 📄</button>
             </div>
+            
             <div id="pdf-area">
-                <div style="text-align:center; border-bottom: 2px solid var(--p); padding-bottom: 10px; margin-bottom: 20px;">
-                    <h2 style="color:var(--p); margin:0;">شركة البريقة لتسويق النفط</h2>
-                    <p>تقرير حركة المخزون العام</p>
+                <div style="text-align:center; margin-bottom: 30px; border-bottom: 2px solid var(--p); padding-bottom: 10px;">
+                    <h1 style="margin:0; color:var(--p);">شركة البريقة لتسويق النفط</h1>
+                    <h3 style="margin:5px 0;">تقرير حركة المخزون التراكمي</h3>
+                    <p>التاريخ: <span id="currentDate"></span></p>
                 </div>
-                <table>
+                <table id="logsTable">
                     <thead>
                         <tr>
-                            <th>التاريخ والوقت</th>
+                            <th>التوقيت</th>
                             <th>الخزان</th>
-                            <th>وارد (+)</th>
-                            <th>منصرف (-)</th>
-                            <th>الإجمالي</th>
+                            <th>الوارد</th>
+                            <th>منصرف</th>
+                            <th>المتبقي</th>
                             <th>الموظف</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
                 </table>
             </div>
-        </section>
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="m-content">
-            <h3 style="text-align:center">تعديل المخزون</h3>
-            <label>كمية واردة</label><input type="number" id="inQ" placeholder="0">
-            <label>كمية منصرفة</label><input type="number" id="outQ" placeholder="0">
-            <label>درجة الحرارة</label><input type="number" id="tempQ" step="0.1">
-            <button onclick="save()" style="width:100%; padding:15px; background:var(--ok); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">حفظ</button>
-            <button onclick="closeEdit()" style="width:100%; background:none; border:none; margin-top:10px; color:gray; cursor:pointer;">إلغاء</button>
+            <button onclick="closeLogs()" style="width:100%; border:none; margin-top:20px; color:gray; cursor:pointer; padding:10px;">إغلاق</button>
         </div>
     </div>
 
@@ -126,18 +124,11 @@
         const db = getDatabase(app);
         const user = localStorage.getItem("currentUser") || "40366";
         let allTanks = [];
+        let allLogs = [];
 
-        // التحكم في القائمة
         window.toggleMenu = () => {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
-        }
-
-        // التبديل بين الأقسام
-        window.showSection = (id) => {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            toggleMenu();
         }
 
         onValue(ref(db, 'tanks'), (s) => {
@@ -148,28 +139,23 @@
         onValue(ref(db, 'logs'), (s) => {
             const data = s.val();
             if (data) { 
-                const logs = Object.values(data).reverse();
-                document.getElementById('logsBody').innerHTML = logs.map(l => `
-                    <tr>
-                        <td>${l.time}</td><td>${l.tank}</td>
-                        <td style="color:green">+${l.in}</td><td style="color:red">-${l.out}</td>
-                        <td style="font-weight:bold">${l.total.toLocaleString()}</td><td>${l.user}</td>
-                    </tr>`).join('');
+                allLogs = Object.values(data).reverse(); 
+                updateLogs(); 
             }
         });
 
         window.draw = () => {
             const g = document.getElementById('tanksGrid'); g.innerHTML = '';
             let filtered = (user === "36640") ? allTanks.filter(t => t.id === 2) : allTanks;
-            document.getElementById('userRole').innerText = (user === "36640") ? "مشرف الخزان 2" : "المدير العام";
+            document.getElementById('userRole').innerText = (user === "36640") ? "مشرف خزان 2" : "المدير العام";
 
             filtered.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
-                let color = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
+                let c = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
                         <h3>${t.name}</h3>
-                        <div class="tank-vis"><div class="fuel" style="height:${p}%; background:${color}"></div></div>
+                        <div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div>
                         <div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div>
                         <small>${p.toFixed(1)}% | ${t.temp}°C</small>
                     </div>`;
@@ -180,19 +166,31 @@
             const idx = allTanks.findIndex(x => x.id === window.curId);
             const inV = parseFloat(document.getElementById('inQ').value) || 0;
             const outV = parseFloat(document.getElementById('outQ').value) || 0;
-            const tmpV = parseFloat(document.getElementById('tempQ').value);
-            allTanks[idx].qty = Math.max(0, Math.round(allTanks[idx].qty + inV - outV));
-            if(!isNaN(tmpV)) allTanks[idx].temp = tmpV;
+            const newQty = Math.round(allTanks[idx].qty + inV - outV);
+            allTanks[idx].qty = Math.max(0, newQty);
 
             push(ref(db, 'logs'), {
                 time: new Date().toLocaleString('ar-LY'),
                 tank: allTanks[idx].name, in: inV, out: outV, total: allTanks[idx].qty, user: user
             });
-            set(ref(db, 'tanks'), allTanks).then(() => closeEdit());
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                closeEdit();
+                document.getElementById('inQ').value = ""; document.getElementById('outQ').value = "";
+            });
+        }
+
+        function updateLogs() {
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('ar-LY');
+            document.getElementById('logsBody').innerHTML = allLogs.map(l => `
+                <tr>
+                    <td>${l.time}</td><td>${l.tank}</td>
+                    <td style="color:green">+${l.in}</td><td style="color:red">-${l.out}</td>
+                    <td style="font-weight:bold">${l.total.toLocaleString()}</td><td>${l.user}</td>
+                </tr>`).join('');
         }
 
         window.downloadPDF = () => {
-            html2canvas(document.getElementById('pdf-area'), { scale: 2 }).then(canvas => {
+            html2canvas(document.getElementById('pdf-area'), { scale: 3 }).then(canvas => {
                 const img = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -204,6 +202,8 @@
         window.logout = () => { localStorage.clear(); location.replace('index.html'); }
         window.openEdit = (id) => { window.curId = id; document.getElementById('editModal').style.display = 'flex'; }
         window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
+        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; }
+        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
     </script>
 </body>
 </html>
