@@ -27,20 +27,16 @@
     <div class="card">
         <img src="Logo.png.PNG" class="logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png'">
         <h2>تتبع الخزانات الذكي</h2>
-        
         <div class="group">
             <label>الرقم الوظيفي</label>
-            <input type="text" id="username" placeholder="الرقم الوظيفي">
+            <input type="text" id="username" placeholder="أدخل الرقم الوظيفي">
         </div>
-        
         <div class="group">
             <label>كلمة السر</label>
-            <input type="password" id="password" placeholder="كلمة السر">
+            <input type="password" id="password" placeholder="أدخل كلمة السر">
         </div>
-        
         <button onclick="login()">تسجيل الدخول</button>
         <div id="errorMessage" class="error"></div>
-        
         <div class="reg">لا تملك صلاحية؟ <a href="#" onclick="openModal()">طلب حساب</a></div>
     </div>
 
@@ -55,7 +51,7 @@
                 <label>كلمة السر المقترحة</label>
                 <input type="password" id="newPass" placeholder="كلمة السر">
             </div>
-            <button id="sendBtn" onclick="sendEmail()" style="width: 100%; padding: 12px; background: var(--p); color: white; border: none; border-radius: 8px; cursor: pointer;">إرسال الطلب للإدارة</button>
+            <button id="sendBtn" onclick="sendEmail()">إرسال الطلب للإدارة</button>
             <button onclick="closeModal()" style="background:none; color:#64748b; margin-top:10px; border:none; width:100%; cursor:pointer;">إلغاء</button>
         </div>
     </div>
@@ -74,27 +70,15 @@
                 e.innerText = "البيانات غير صحيحة، يرجى التأكد."; 
             }
         }
-
         function openModal() { document.getElementById('regModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('regModal').style.display = 'none'; }
-
         function sendEmail() {
-            const u = document.getElementById('newU').value;
-            const p = document.getElementById('newPass').value;
-            const btn = document.getElementById('sendBtn');
+            const u = document.getElementById('newU').value, p = document.getElementById('newPass').value, btn = document.getElementById('sendBtn');
             if(!u || !p) { alert("يرجى إدخال البيانات"); return; }
-            btn.innerText = "جاري الإرسال...";
-            btn.disabled = true;
+            btn.innerText = "جاري الإرسال..."; btn.disabled = true;
             emailjs.send('service_x51n5hk', 'template_0jv1nde', { new_user: u, new_pass: p })
-            .then(() => {
-                alert("✅ تم إرسال الطلب بنجاح!");
-                closeModal();
-                btn.innerText = "إرسال الطلب للإدارة";
-                btn.disabled = false;
-            }, (err) => {
-                alert("❌ فشل الإرسال");
-                btn.disabled = false;
-            });
+            .then(() => { alert("✅ تم إرسال الطلب بنجاح!"); closeModal(); btn.innerText = "إرسال الطلب للإدارة"; btn.disabled = false; }, 
+            (err) => { alert("❌ فشل الإرسال"); btn.disabled = false; });
         }
     </script>
 </body>
