@@ -3,83 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دخول - شركة البريقة</title>
+    <title>لوحة التحكم - شركة البريقة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        :root { --p: #004a99; --s: #002d5d; --bg: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; direction: rtl; }
-        .card { background: white; padding: 40px 30px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .logo { width: 120px; margin-bottom: 20px; }
-        h2 { color: var(--s); margin: 0 0 30px 0; font-size: 1.5rem; }
-        .group { text-align: right; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #64748b; font-size: 0.9rem; }
-        input { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f1f5f9; box-sizing: border-box; outline: none; transition: 0.3s; background: #f8fafc; font-size: 1rem; }
-        input:focus { border-color: var(--p); background: white; box-shadow: 0 0 0 4px rgba(0,74,153,0.1); }
-        button { width: 100%; padding: 16px; background: var(--p); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1.1rem; margin-top: 10px; transition: 0.3s; }
-        button:hover { background: var(--s); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,74,153,0.2); }
-        .error { color: #ef4444; font-size: 0.85rem; margin-top: 15px; display: none; background: #fee2e2; padding: 10px; border-radius: 8px; }
-        .reg { margin-top: 25px; font-size: 0.9rem; color: #94a3b8; padding-top: 20px; border-top: 1px solid #f1f5f9; }
-        .reg a { color: var(--p); text-decoration: none; font-weight: bold; }
+        :root { --p: #004a99; --s: #002d5d; --bg: #f1f5f9; --ok: #10b981; --warn: #f59e0b; --err: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; direction: rtl; color: #1e293b; }
+        .header { background: var(--p); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .btns-group { display: flex; gap: 10px; }
+        .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
+        .container { padding: 30px 5%; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .tank-card { background: white; border-radius: 24px; padding: 25px; text-align: center; position: relative; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .temp-tag { position: absolute; top: 20px; left: 20px; background: #f8fafc; padding: 6px 12px; border-radius: 12px; font-weight: 800; border: 1px solid #e2e8f0; }
+        .tank-vis { width: 100px; height: 140px; border: 4px solid #334155; margin: 20px auto; position: relative; border-radius: 15px; background: #f1f5f9; overflow: hidden; }
+        .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
+        .qty { font-size: 1.6rem; font-weight: 800; color: var(--s); }
+        .p-bar { background: #f1f5f9; height: 8px; border-radius: 10px; width: 80%; margin: 15px auto; overflow: hidden; }
+        .p-fill { height: 100%; transition: 1s; }
         .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
-        .m-content { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 24px; position: relative; }
+        .m-content { background: white; width: 95%; max-width: 650px; padding: 30px; border-radius: 24px; max-height: 85vh; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
+        th { background: #f8fafc; color: var(--s); }
+        input { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
+        .pdf-btn { background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .update-btn { background: var(--ok); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <img src="Logo.png.PNG" class="logo" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png'">
-        <h2>تتبع الخزانات الذكي</h2>
-        <div class="group">
-            <label>الرقم الوظيفي</label>
-            <input type="text" id="username" placeholder="أدخل الرقم الوظيفي">
+
+    <header class="header">
+        <div><h1>منظومة البريقة</h1><small id="userRole"></small></div>
+        <div class="btns-group">
+            <button onclick="openLogs()" class="nav-btn">📊 كشف الحركات</button>
+            <button onclick="logout()" class="nav-btn">خروج 🔄</button>
         </div>
-        <div class="group">
-            <label>كلمة السر</label>
-            <input type="password" id="password" placeholder="أدخل كلمة السر">
+    </header>
+
+    <div class="container"><div class="grid" id="tanksGrid"></div></div>
+
+    <div id="editModal" class="modal">
+        <div class="m-content" style="max-width: 400px;">
+            <h3 id="mTankTitle" style="text-align:center;">تحديث البيانات</h3>
+            <label>كمية داخلة (+)</label><input type="number" id="inQ" placeholder="0">
+            <label>كمية خارجة (-)</label><input type="number" id="outQ" placeholder="0">
+            <label>درجة الحرارة (°C)</label><input type="number" id="tempQ" step="0.1">
+            <button class="update-btn" onclick="save()">تأكيد وحفظ</button>
+            <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; color:#94a3b8; cursor:pointer">إلغاء</button>
         </div>
-        <button onclick="login()">تسجيل الدخول</button>
-        <div id="errorMessage" class="error"></div>
-        <div class="reg">لا تملك صلاحية؟ <a href="#" onclick="openModal()">طلب حساب</a></div>
     </div>
 
-    <div id="regModal" class="modal">
+    <div id="logsModal" class="modal">
         <div class="m-content">
-            <h3 style="margin-top:0; color:var(--s)">طلب تسجيل جديد</h3>
-            <div class="group">
-                <label>الرقم الوظيفي</label>
-                <input type="text" id="newU" placeholder="الرقم الوظيفي">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:15px;">
+                <h3>سجل العمليات التفصيلي</h3>
+                <button onclick="downloadPDF()" class="pdf-btn">تحميل تقرير PDF 📄</button>
             </div>
-            <div class="group">
-                <label>كلمة السر المقترحة</label>
-                <input type="password" id="newPass" placeholder="كلمة السر">
-            </div>
-            <button id="sendBtn" onclick="sendEmail()">إرسال الطلب للإدارة</button>
-            <button onclick="closeModal()" style="background:none; color:#64748b; margin-top:10px; border:none; width:100%; cursor:pointer;">إلغاء</button>
+            <table id="logsTable">
+                <thead>
+                    <tr>
+                        <th>التاريخ والوقت</th>
+                        <th>الخزان</th>
+                        <th>الداخل (+)</th>
+                        <th>الخارج (-)</th>
+                        <th>الإجمالي الحالي</th>
+                        <th>بواسطة</th>
+                    </tr>
+                </thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+            <button onclick="closeLogs()" style="width:100%; border:none; background:none; margin-top:20px; color:#94a3b8; cursor:pointer">إغلاق</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.js"></script>
-    <script>
-        (function(){ emailjs.init("J6WMPCNz4MGxy6WjR"); })();
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
-        function login() {
-            const u = document.getElementById('username').value, p = document.getElementById('password').value, e = document.getElementById('errorMessage');
-            if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
-                localStorage.setItem("currentUser", u); 
-                window.location.href = "dashboard.html";
-            } else { 
-                e.style.display = "block"; 
-                e.innerText = "البيانات غير صحيحة، يرجى التأكد."; 
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
+            authDomain: "brega-system.firebaseapp.com",
+            projectId: "brega-system",
+            databaseURL: "https://brega-system-default-rtdb.firebaseio.com",
+            storageBucket: "brega-system.firebasestorage.app",
+            messagingSenderId: "197985418350",
+            appId: "1:197985418350:web:09c8497e8d3c810f8dfa7f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const user = localStorage.getItem("currentUser") || "مجهول";
+        let allTanks = [];
+        let allLogs = [];
+
+        onValue(ref(db, 'tanks'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) { allTanks = Object.values(data); draw(); }
+        });
+
+        onValue(ref(db, 'logs'), (snapshot) => {
+            const data = snapshot.val();
+            if (data) { allLogs = Object.values(data).reverse(); updateLogsTable(); }
+        });
+
+        window.draw = function() {
+            const g = document.getElementById('tanksGrid'); g.innerHTML = '';
+            let displayData = (user === "36640") ? allTanks.filter(t => t.id === 2) : allTanks;
+            document.getElementById('userRole').innerText = (user === "36640") ? "مشرف الخزان 2" : "المدير العام";
+
+            displayData.forEach(t => {
+                const p = (t.qty / t.cap) * 100;
+                let c = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
+                g.innerHTML += `
+                    <div class="tank-card" onclick="openEdit(${t.id})">
+                        <div class="temp-tag">${t.temp}°C</div>
+                        <h3 style="margin-top:35px">${t.name}</h3>
+                        <div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div>
+                        <div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div>
+                        <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${c}"></div></div>
+                        <small>${p.toFixed(1)}%</small>
+                    </div>`;
+            });
         }
-        function openModal() { document.getElementById('regModal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('regModal').style.display = 'none'; }
-        function sendEmail() {
-            const u = document.getElementById('newU').value, p = document.getElementById('newPass').value, btn = document.getElementById('sendBtn');
-            if(!u || !p) { alert("يرجى إدخال البيانات"); return; }
-            btn.innerText = "جاري الإرسال..."; btn.disabled = true;
-            emailjs.send('service_x51n5hk', 'template_0jv1nde', { new_user: u, new_pass: p })
-            .then(() => { alert("✅ تم إرسال الطلب بنجاح!"); closeModal(); btn.innerText = "إرسال الطلب للإدارة"; btn.disabled = false; }, 
-            (err) => { alert("❌ فشل الإرسال"); btn.disabled = false; });
+
+        window.save = function() {
+            const tIndex = allTanks.findIndex(x => x.id === window.currentId);
+            const inVal = parseFloat(document.getElementById('inQ').value) || 0;
+            const outVal = parseFloat(document.getElementById('outQ').value) || 0;
+            const tempVal = parseFloat(document.getElementById('tempQ').value);
+
+            const oldQty = allTanks[tIndex].qty;
+            const newQty = Math.min(allTanks[tIndex].cap, Math.max(0, oldQty + inVal - outVal));
+            
+            allTanks[tIndex].qty = newQty;
+            if(!isNaN(tempVal)) allTanks[tIndex].temp = tempVal;
+
+            const now = new Date();
+            const dateStr = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()} - ${now.getHours()}:${now.getMinutes()}`;
+
+            const newLog = {
+                time: dateStr,
+                tankName: allTanks[tIndex].name,
+                added: inVal,
+                subbed: outVal,
+                total: Math.round(newQty),
+                user: user
+            };
+
+            push(ref(db, 'logs'), newLog);
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                closeEdit();
+                document.getElementById('inQ').value = "";
+                document.getElementById('outQ').value = "";
+            });
         }
+
+        function updateLogsTable() {
+            document.getElementById('logsBody').innerHTML = allLogs.map(l => `
+                <tr>
+                    <td>${l.time}</td>
+                    <td>${l.tankName}</td>
+                    <td style="color:green">+${l.added.toLocaleString()}</td>
+                    <td style="color:red">-${l.subbed.toLocaleString()}</td>
+                    <td style="font-weight:bold">${l.total.toLocaleString()}</td>
+                    <td>${l.user}</td>
+                </tr>
+            `).join('');
+        }
+
+        window.downloadPDF = function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+            
+            doc.setFontSize(18);
+            doc.text("شركة البريقة لتسويق النفط", 300, 40, { align: "center" });
+            doc.setFontSize(14);
+            doc.text("كشف حركات وتتبع الخزانات اليومي", 300, 70, { align: "center" });
+            
+            doc.autoTable({
+                html: '#logsTable',
+                startY: 100,
+                styles: { fontSize: 10, cellPadding: 8, halign: 'center' },
+                headStyles: { fillStyle: 'f', fillColor: [0, 74, 153], textColor: [255, 255, 255] }
+            });
+            
+            doc.save(`تقرير_البريقة_${new Date().toLocaleDateString()}.pdf`);
+        }
+
+        window.openEdit = (id) => { window.currentId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
+        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; }
+        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
+        window.logout = () => { window.location.replace("index.html"); }
     </script>
 </body>
 </html>
