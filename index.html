@@ -50,7 +50,6 @@
         .footer-link { margin-top: 30px; font-size: 0.9rem; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 20px; }
         .footer-link a { color: var(--primary); text-decoration: none; font-weight: bold; }
 
-        /* Modal Request */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
         .m-content { background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; }
     </style>
@@ -62,12 +61,12 @@
         
         <div class="input-group">
             <label>الرقم الوظيفي</label>
-            <input type="text" id="username" placeholder="مثال: 40366">
+            <input type="text" id="username" placeholder="الرقم الوظيفي">
         </div>
 
         <div class="input-group">
-            <label>كلمة المرور</label>
-            <input type="password" id="password" placeholder="••••••••">
+            <label>كلمة السر</label>
+            <input type="password" id="password" placeholder="كلمة السر">
         </div>
 
         <button onclick="login()">دخول للنظام</button>
@@ -83,11 +82,11 @@
             <h3 style="margin-top:0">طلب وصول للنظام</h3>
             <div class="input-group">
                 <label>الرقم الوظيفي</label>
-                <input type="text" id="newU">
+                <input type="text" id="newU" placeholder="الرقم الوظيفي">
             </div>
             <div class="input-group">
-                <label>كلمة المرور المطلوبة</label>
-                <input type="password" id="newPass">
+                <label>كلمة السر المقترحة</label>
+                <input type="password" id="newPass" placeholder="كلمة السر">
             </div>
             <button id="sendBtn" onclick="sendEmail()">إرسال الطلب</button>
             <button onclick="closeModal()" style="background:none; color:#94a3b8; margin-top:10px; border:none; width:100%; cursor:pointer;">إلغاء</button>
