@@ -10,13 +10,13 @@
         :root { 
             --primary: #004a99; 
             --primary-dark: #003366;
-            --accent: #e11d48;
             --bg: #f8fafc; 
             --card-bg: #ffffff;
             --text-main: #1e293b;
-            --success: #10b981; 
-            --warning: #f59e0b; 
-            --danger: #ef4444; 
+            /* الألوان المطلوبة */
+            --danger: #ef4444;  /* أحمر */
+            --warning: #f59e0b; /* أصفر/برتقالي */
+            --success: #10b981; /* أخضر */
         }
 
         body { 
@@ -223,17 +223,27 @@
 
             displayData.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
-                let c = p < 20 ? "var(--danger)" : (p < 50 ? "var(--warning)" : "var(--success)");
+                
+                // --- منطق الألوان المطلوب ---
+                let color;
+                if (p <= 25) {
+                    color = "var(--danger)";  // أحمر
+                } else if (p <= 75) {
+                    color = "var(--warning)"; // أصفر
+                } else {
+                    color = "var(--success)"; // أخضر
+                }
+
                 g.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
                         <div class="temp-tag">${t.temp}°C</div>
                         <h3 style="margin-top:20px; color:#475569">${t.name}</h3>
                         <div class="tank-vis">
-                            <div class="fuel" style="height:${p}%; background:${c}; opacity: 0.8"></div>
+                            <div class="fuel" style="height:${p}%; background:${color}; opacity: 0.8"></div>
                         </div>
                         <div class="qty">${Math.round(t.qty).toLocaleString()} L</div>
                         <div class="p-bar-container">
-                            <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${c}"></div></div>
+                            <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${color}"></div></div>
                             <small style="color:#94a3b8; font-weight:bold">${p.toFixed(1)}% ممتلئ</small>
                         </div>
                     </div>`;
