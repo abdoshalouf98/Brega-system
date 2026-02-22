@@ -14,7 +14,8 @@
         .nav-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; }
         .container { padding: 30px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        .tank-card { background: white; border-radius: 24px; padding: 25px; text-align: center; position: relative; border: 1px solid #e2e8f0; cursor: pointer; }
+        .tank-card { background: white; border-radius: 24px; padding: 25px; text-align: center; position: relative; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.3s; }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
         .temp-tag { position: absolute; top: 20px; left: 20px; background: #f8fafc; padding: 6px 12px; border-radius: 12px; font-weight: 800; border: 1px solid #e2e8f0; }
         .tank-vis { width: 100px; height: 140px; border: 4px solid #334155; margin: 20px auto; position: relative; border-radius: 15px; background: #f1f5f9; overflow: hidden; }
         .fuel { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
@@ -25,13 +26,13 @@
         .m-content { background: white; width: 95%; max-width: 600px; padding: 30px; border-radius: 24px; max-height: 80vh; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-        th { background: #f8fafc; }
         input { width: 100%; padding: 12px; border: 2px solid #f1f5f9; border-radius: 12px; margin-bottom: 15px; box-sizing: border-box; }
         .pdf-btn { background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
         .update-btn { background: var(--ok); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
+
     <header class="header">
         <div><h1>منظومة البريقة</h1><small id="userRole"></small></div>
         <div class="btns-group">
@@ -44,11 +45,11 @@
 
     <div id="editModal" class="modal">
         <div class="m-content" style="max-width: 400px;">
-            <h3 id="mTankTitle">تحديث البيانات</h3>
+            <h3 id="mTankTitle" style="text-align:center;">تحديث البيانات</h3>
             <label>كمية داخلة (+)</label><input type="number" id="inQ" placeholder="0">
             <label>كمية خارجة (-)</label><input type="number" id="outQ" placeholder="0">
             <label>درجة الحرارة (°C)</label><input type="number" id="tempQ" step="0.1">
-            <button class="update-btn" onclick="save()">تأكيد وحفظ</button>
+            <button class="update-btn" onclick="save()">تأكيد وحفظ للكل</button>
             <button onclick="closeEdit()" style="width:100%; border:none; background:none; margin-top:10px; color:#94a3b8; cursor:pointer">إلغاء</button>
         </div>
     </div>
@@ -71,6 +72,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+        // مفاتيح الربط الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
             authDomain: "brega-system.firebaseapp.com",
@@ -87,28 +89,46 @@
         let allTanks = [];
         let allLogs = [];
 
+        // مزامنة الخزانات
         onValue(ref(db, 'tanks'), (snapshot) => {
             const data = snapshot.val();
-            if (data) { allTanks = Object.values(data); draw(); }
-            else { 
-                allTanks = []; for(let i=1; i<=8; i++) allTanks.push({ id: i, name: "خزان " + i, qty: 500000, cap: 1000000, temp: 25.0 });
+            if (data) { 
+                allTanks = Object.values(data); 
+                draw(); 
+            } else { 
+                // توليد بيانات أولية إذا كانت القاعدة فارغة
+                allTanks = [];
+                for(let i=1; i<=8; i++) {
+                    allTanks.push({ id: i, name: "خزان " + i, qty: 500000, cap: 1000000, temp: 25.0 });
+                }
                 set(ref(db, 'tanks'), allTanks);
             }
         });
 
+        // مزامنة السجل
         onValue(ref(db, 'logs'), (snapshot) => {
             const data = snapshot.val();
             if (data) { allLogs = Object.values(data).reverse(); updateLogsTable(); }
         });
 
         window.draw = function() {
-            const g = document.getElementById('tanksGrid'); g.innerHTML = '';
+            const g = document.getElementById('tanksGrid');
+            g.innerHTML = '';
             let displayData = (user === "36640") ? allTanks.filter(t => t.id === 2) : allTanks;
             document.getElementById('userRole').innerText = (user === "36640") ? "مشرف الخزان 2" : "المدير العام";
+
             displayData.forEach(t => {
                 const p = (t.qty / t.cap) * 100;
                 let c = p < 25 ? "var(--err)" : (p <= 75 ? "var(--warn)" : "var(--ok)");
-                g.innerHTML += `<div class="tank-card" onclick="openEdit(${t.id})"><div class="temp-tag">${t.temp}°C</div><h3 style="margin-top:35px">${t.name}</h3><div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div><div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div><div class="p-bar"><div class="p-fill" style="width:${p}%; background:${c}"></div></div><small>${p.toFixed(1)}%</small></div>`;
+                g.innerHTML += `
+                    <div class="tank-card" onclick="openEdit(${t.id})">
+                        <div class="temp-tag">${t.temp}°C</div>
+                        <h3 style="margin-top:35px">${t.name}</h3>
+                        <div class="tank-vis"><div class="fuel" style="height:${p}%; background:${c}"></div></div>
+                        <div class="qty">${Math.round(t.qty).toLocaleString()} لتر</div>
+                        <div class="p-bar"><div class="p-fill" style="width:${p}%; background:${c}"></div></div>
+                        <small>${p.toFixed(1)}%</small>
+                    </div>`;
             });
         }
 
@@ -117,19 +137,42 @@
             const inVal = parseFloat(document.getElementById('inQ').value) || 0;
             const outVal = parseFloat(document.getElementById('outQ').value) || 0;
             const tempVal = parseFloat(document.getElementById('tempQ').value);
+
             allTanks[tIndex].qty = Math.min(allTanks[tIndex].cap, Math.max(0, allTanks[tIndex].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[tIndex].temp = tempVal;
-            const newLog = { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[tIndex].name, added: inVal, subbed: outVal, user: user };
+
+            // تسجيل الحركة
+            const newLog = {
+                time: new Date().toLocaleString('ar-LY'),
+                tankName: allTanks[tIndex].name,
+                added: inVal,
+                subbed: outVal,
+                user: user
+            };
             push(ref(db, 'logs'), newLog);
-            set(ref(db, 'tanks'), allTanks).then(() => { closeEdit(); document.getElementById('inQ').value = ""; document.getElementById('outQ').value = ""; });
+
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                closeEdit();
+                document.getElementById('inQ').value = "";
+                document.getElementById('outQ').value = "";
+            });
         }
 
         function updateLogsTable() {
-            document.getElementById('logsBody').innerHTML = allLogs.map(l => `<tr><td>${l.time}</td><td>${l.tankName}</td><td style="color:green">+${l.added}</td><td style="color:red">-${l.subbed}</td><td>${l.user}</td></tr>`).join('');
+            document.getElementById('logsBody').innerHTML = allLogs.map(l => `
+                <tr>
+                    <td>${l.time}</td>
+                    <td>${l.tankName}</td>
+                    <td style="color:green">+${l.added}</td>
+                    <td style="color:red">-${l.subbed}</td>
+                    <td>${l.user}</td>
+                </tr>
+            `).join('');
         }
 
         window.downloadPDF = function() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             doc.text("كشف حركات الخزانات - شركة البريقة", 105, 10, { align: "center" });
             doc.autoTable({ html: '#logsTable', theme: 'grid' });
             doc.save(`Brega_Report.pdf`);
