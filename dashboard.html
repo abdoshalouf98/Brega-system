@@ -15,6 +15,7 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
+        /* الهيدر */
         .header-container {
             background: white; padding: 10px 5%; text-align: center;
             border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -33,68 +34,51 @@
         .container { padding: 160px 5% 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
-        /* --- تصميم الخزان الأسطواني المطور --- */
+        /* تصميم الخزان الأسطواني */
         .tank-card { 
             background: white; border-radius: 20px; padding: 20px; text-align: center; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
             border: 1px solid #e2e8f0; position: relative;
         }
-        .tank-card:hover { transform: translateY(-5px); }
-        
         .temp-badge { font-size: 0.75rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 4px 10px; border-radius: 20px; border: 1px solid #cbd5e1; }
         .tank-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #1e293b; }
 
-        /* جسم الخزان الأسطواني */
         .cylindrical-tank {
             width: 140px; height: 160px; margin: 0 auto 20px;
             position: relative;
-            background: #e2e8f0;
-            border: 3px solid #94a3b8;
-            border-radius: 10px 10px 5px 5px;
-            overflow: hidden;
-            /* تأثير اللمعان والعمق */
             background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 20%, #ffffff 50%, #f1f5f9 80%, #94a3b8 100%);
+            border: 3px solid #94a3b8; border-radius: 10px 10px 5px 5px; overflow: hidden;
         }
+        .tank-rings { position: absolute; inset: 0; background-image: linear-gradient(transparent 19%, #94a3b8 20%, #94a3b8 21%, transparent 22%); background-size: 100% 40px; z-index: 3; }
+        .tank-ladder { position: absolute; left: 15px; top: 0; bottom: 0; width: 15px; border-left: 2px solid #64748b; border-right: 2px solid #64748b; background-image: linear-gradient(#64748b 2px, transparent 2px); background-size: 100% 15px; z-index: 4; opacity: 0.6; }
 
-        /* الحلقات الأفقية (Rings) */
-        .tank-rings {
-            position: absolute; inset: 0;
-            background-image: linear-gradient(transparent 19%, #94a3b8 20%, #94a3b8 21%, transparent 22%);
-            background-size: 100% 40px;
-            z-index: 3; pointer-events: none;
-        }
-
-        /* السلم الجانبي */
-        .tank-ladder {
-            position: absolute; left: 15px; top: 0; bottom: 0; width: 15px;
-            border-left: 2px solid #64748b; border-right: 2px solid #64748b;
-            background-image: linear-gradient(#64748b 2px, transparent 2px);
-            background-size: 100% 15px;
-            z-index: 4; opacity: 0.6;
-        }
-
-        /* تعبئة الوقود */
-        .fuel-level {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2;
-        }
+        .fuel-level { position: absolute; bottom: 0; left: 0; width: 100%; transition: height 1s; z-index: 2; }
         .status-danger { background: linear-gradient(90deg, #b91c1c 0%, #ef4444 50%, #b91c1c 100%); }
         .status-warning { background: linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #d97706 100%); }
         .status-success { background: linear-gradient(90deg, #059669 0%, #34d399 50%, #059669 100%); }
 
         .qty-display { font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; }
-        .percent-display { font-size: 0.9rem; color: #64748b; font-weight: bold; }
 
-        /* --- الجداول والمودالات --- */
+        /* مودال السجلات وجدول الكشف */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
-        .m-box { background: white; width: 100%; max-width: 800px; padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .m-box { background: white; width: 100%; max-width: 850px; padding: 25px; border-radius: 20px; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
         
-        #logsTable { width: 100%; border-collapse: collapse; direction: rtl; }
-        #logsTable th { background: #004a99; color: white; padding: 12px; font-size: 0.9rem; }
-        #logsTable td { padding: 10px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+        #captureArea { background: white; padding: 20px; overflow-y: auto; flex-grow: 1; border: 1px solid #eee; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #004a99; color: white; padding: 12px; font-size: 0.95rem; border: 1px solid #003366; }
+        td { padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 0.9rem; }
 
-        .btn-pdf { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        /* زر التحميل الجديد */
+        .btn-download-main {
+            background: #10b981; color: white; border: none; padding: 12px 25px;
+            border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem;
+            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+        }
+        .btn-download-main:active { transform: scale(0.95); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; }
     </style>
 </head>
 <body>
@@ -106,44 +90,51 @@
     </header>
 
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
-    <div class="sidebar" id="sidebar" style="position:fixed; top:0; right:-300px; width:280px; height:100%; background:white; z-index:2000; transition:0.4s; box-shadow:-5px 0 15px rgba(0,0,0,0.1);">
+    <div class="sidebar" id="sidebar">
         <div style="padding:30px; text-align:center;"><img src="Brega.PNG" width="80"></div>
         <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="closeNav()">الرئيسية</div>
-        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="openLogs()">سجل الحركات</div>
+        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="openLogs()">سجل الحركات (الكشف)</div>
     </div>
 
     <div class="container"><div class="grid" id="tanksGrid"></div></div>
 
     <div id="logsModal" class="modal">
         <div class="m-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                <h3 style="margin:0;">سجل حركة الخزانات</h3>
-                <button class="btn-pdf" id="pdfBtn" onclick="downloadPDF()">تحميل PDF</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0; color:var(--primary);">كشف حركة الخزانات اليومي</h3>
+                <button class="btn-download-main" id="pdfBtn" onclick="downloadPDF()">
+                    📥 تحميل الكشف
+                </button>
             </div>
-            <div id="captureArea" style="background:white; padding:15px; max-height:60vh; overflow-y:auto;">
+
+            <div id="captureArea">
+                <div style="text-align:center; border-bottom:2px solid #004a99; padding-bottom:10px; margin-bottom:15px;">
+                    <h2 style="margin:0; color:#004a99;">Brega Petroleum - Tanks Report</h2>
+                </div>
                 <table id="logsTable">
                     <thead>
                         <tr>
-                            <th>التاريخ</th>
-                            <th>الخزان</th>
-                            <th>وارد (+)</th>
-                            <th>منصرف (-)</th>
+                            <th style="width: 25%;">التاريخ</th>
+                            <th style="width: 25%;">الخزان</th>
+                            <th style="width: 25%;">وارد (+)</th>
+                            <th style="width: 25%;">منصرف (-)</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
                 </table>
             </div>
-            <button onclick="closeLogs()" style="width:100%; margin-top:15px; padding:10px; border:none; background:#eee; border-radius:8px; cursor:pointer;">إغلاق</button>
+            
+            <button onclick="closeLogs()" style="width:100%; margin-top:15px; padding:12px; border:none; background:#f1f5f9; color:#475569; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق النافذة</button>
         </div>
     </div>
 
     <div id="editModal" class="modal">
         <div class="m-box" style="max-width:400px;">
-            <h3 style="text-align:center;">تحديث البيانات</h3>
-            <label>وارد +</label><input type="number" id="inQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
-            <label>منصرف -</label><input type="number" id="outQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
-            <label>الحرارة</label><input type="number" id="tempQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
-            <button onclick="saveData()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">حفظ التغييرات</button>
+            <h3 style="text-align:center; color:var(--primary);">تحديث بيانات التشغيل</h3>
+            <label>كمية واردة (+)</label><input type="number" id="inQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <label>كمية منصرفة (-)</label><input type="number" id="outQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <label>درجة الحرارة</label><input type="number" id="tempQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
+            <button onclick="saveData()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1.1rem;">تأكيد وحفظ</button>
         </div>
     </div>
 
@@ -163,8 +154,8 @@
         const db = getDatabase(app);
         let allTanks = [];
 
-        window.openNav = () => { document.getElementById('sidebar').style.right = '0'; }
-        window.closeNav = () => { document.getElementById('sidebar').style.right = '-300px'; }
+        window.openNav = () => { document.getElementById('sidebar').style.right = '0'; document.getElementById('overlay').style.display = 'block'; }
+        window.closeNav = () => { document.getElementById('sidebar').style.right = '-300px'; document.getElementById('overlay').style.display = 'none'; }
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
 
@@ -174,45 +165,66 @@
             container.innerHTML = '';
             allTanks.forEach(t => {
                 const percent = Math.min(100, (t.qty / t.cap) * 100);
-                let status = 'status-success';
-                if (percent < 20) status = 'status-danger';
-                else if (percent < 50) status = 'status-warning';
-
+                let status = (percent < 20) ? 'status-danger' : (percent < 50) ? 'status-warning' : 'status-success';
                 container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
                         <div class="temp-badge">🌡️ ${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
                         <div class="cylindrical-tank">
-                            <div class="tank-ladder"></div>
-                            <div class="tank-rings"></div>
+                            <div class="tank-ladder"></div><div class="tank-rings"></div>
                             <div class="fuel-level ${status}" style="height:${percent}%"></div>
                         </div>
                         <div class="qty-display">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="percent-display">${percent.toFixed(1)}% ممتلئ</div>
+                        <div style="color:#64748b; font-weight:bold;">${percent.toFixed(1)}% ممتلئ</div>
                     </div>`;
             });
         });
 
         onValue(ref(db, 'logs'), (snap) => {
             const logs = Object.values(snap.val() || {}).reverse();
-            document.getElementById('logsBody').innerHTML = logs.slice(0, 30).map(l => `
+            document.getElementById('logsBody').innerHTML = logs.slice(0, 40).map(l => `
                 <tr>
-                    <td style="font-size:0.7rem;">${l.time}</td>
-                    <td style="font-weight:bold;">${l.tankName}</td>
-                    <td style="color:green;">+${l.added}</td>
-                    <td style="color:red;">-${l.subbed}</td>
+                    <td style="font-size:0.75rem; color:#555;">${l.time}</td>
+                    <td>${l.tankName}</td>
+                    <td style="color:#10b981;">+${l.added.toLocaleString()}</td>
+                    <td style="color:#ef4444;">-${l.subbed.toLocaleString()}</td>
                 </tr>
             `).join('');
         });
 
+        // وظيفة التحميل المحسنة للهواتف والكمبيوتر
         window.downloadPDF = () => {
+            const btn = document.getElementById('pdfBtn');
             const element = document.getElementById('captureArea');
-            html2canvas(element, { scale: 3 }).then(canvas => {
+            
+            btn.innerText = "جاري التحميل...";
+            btn.style.opacity = "0.7";
+
+            html2canvas(element, { 
+                scale: 3, 
+                useCORS: true,
+                logging: false,
+                allowTaint: true
+            }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-                pdf.text("Brega Petroleum - Tanks Report", 105, 15, { align: "center" });
-                pdf.addImage(imgData, 'PNG', 10, 25, 190, (canvas.height * 190) / canvas.width);
-                pdf.save('Report.pdf');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 190;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+                
+                // حفظ الملف باسم يحتوي على التاريخ
+                const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
+                pdf.save(`كشف_البريقة_${dateStr}.pdf`);
+                
+                btn.innerText = "📥 تحميل الكشف";
+                btn.style.opacity = "1";
+            }).catch(err => {
+                alert("حدث خطأ أثناء التحميل، حاول مرة أخرى.");
+                btn.innerText = "📥 تحميل الكشف";
+                btn.style.opacity = "1";
             });
         }
 
@@ -226,8 +238,17 @@
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
             
-            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal });
-            set(ref(db, 'tanks'), allTanks).then(() => { document.getElementById('editModal').style.display = 'none'; });
+            push(ref(db, 'logs'), { 
+                time: new Date().toLocaleString('ar-LY'), 
+                tankName: allTanks[idx].name, 
+                added: inVal, 
+                subbed: outVal 
+            });
+            set(ref(db, 'tanks'), allTanks).then(() => {
+                document.getElementById('editModal').style.display = 'none';
+                document.getElementById('inQ').value = '';
+                document.getElementById('outQ').value = '';
+            });
         }
     </script>
 </body>
