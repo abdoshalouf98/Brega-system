@@ -10,10 +10,10 @@
     
     <style>
         :root { 
-            --primary: #004a99; --bg: #f0f2f5; 
+            --primary: #004a99; --bg: #f8fafc; 
             --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
         .header-container {
             background: white; padding: 10px 5%; text-align: center;
@@ -21,7 +21,7 @@
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .header-logo { width: 95px; height: auto; margin-bottom: 5px; object-fit: contain; } 
+        .header-logo { width: 90px; height: auto; margin-bottom: 5px; } 
         .header-title { margin: 5px 0 0 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         .menu-btn { 
@@ -31,51 +31,70 @@
         }
 
         .container { padding: 160px 5% 40px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
-        /* تصميم الخزان */
+        /* --- تصميم الخزان الأسطواني المطور --- */
         .tank-card { 
-            background: white; border-radius: 15px; padding: 25px 20px; text-align: center; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
+            background: white; border-radius: 20px; padding: 20px; text-align: center; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
             border: 1px solid #e2e8f0; position: relative;
         }
-        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .tank-card:hover { transform: translateY(-5px); }
         
-        .temp-text { font-size: 0.85rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; }
-        .tank-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; color: #1e293b; }
+        .temp-badge { font-size: 0.75rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 4px 10px; border-radius: 20px; border: 1px solid #cbd5e1; }
+        .tank-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #1e293b; }
 
-        .tank-wrapper {
-            width: 130px; height: 170px; margin: 10px auto 25px;
-            position: relative; 
-            background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 50%, #94a3b8 100%);
-            border: 2px solid #64748b; border-radius: 15px 15px 8px 8px;
+        /* جسم الخزان الأسطواني */
+        .cylindrical-tank {
+            width: 140px; height: 160px; margin: 0 auto 20px;
+            position: relative;
+            background: #e2e8f0;
+            border: 3px solid #94a3b8;
+            border-radius: 10px 10px 5px 5px;
             overflow: hidden;
+            /* تأثير اللمعان والعمق */
+            background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 20%, #ffffff 50%, #f1f5f9 80%, #94a3b8 100%);
         }
-        .fuel-fill { position: absolute; bottom: 0; width: 100%; transition: height 1s ease-in-out; z-index: 2; }
-        .status-danger { background: linear-gradient(180deg, #f87171, #dc2626); }
-        .status-warning { background: linear-gradient(180deg, #fbbf24, #d97706); }
-        .status-success { background: linear-gradient(180deg, #34d399, #059669); }
 
-        .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
-        .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; }
+        /* الحلقات الأفقية (Rings) */
+        .tank-rings {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(transparent 19%, #94a3b8 20%, #94a3b8 21%, transparent 22%);
+            background-size: 100% 40px;
+            z-index: 3; pointer-events: none;
+        }
 
-        /* السايد بار */
-        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .sidebar.active { right: 0; }
-        .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
-        .overlay.active { display: block; }
+        /* السلم الجانبي */
+        .tank-ladder {
+            position: absolute; left: 15px; top: 0; bottom: 0; width: 15px;
+            border-left: 2px solid #64748b; border-right: 2px solid #64748b;
+            background-image: linear-gradient(#64748b 2px, transparent 2px);
+            background-size: 100% 15px;
+            z-index: 4; opacity: 0.6;
+        }
 
-        /* المودال والجداول */
+        /* تعبئة الوقود */
+        .fuel-level {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+        .status-danger { background: linear-gradient(90deg, #b91c1c 0%, #ef4444 50%, #b91c1c 100%); }
+        .status-warning { background: linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #d97706 100%); }
+        .status-success { background: linear-gradient(90deg, #059669 0%, #34d399 50%, #059669 100%); }
+
+        .qty-display { font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; }
+        .percent-display { font-size: 0.9rem; color: #64748b; font-weight: bold; }
+
+        /* --- الجداول والمودالات --- */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
-        .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .m-box { background: white; width: 100%; max-width: 800px; padding: 25px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
         
-        #logsTable { width: 100%; border-collapse: collapse; margin-top: 10px; direction: rtl; text-align: right; }
-        #logsTable th { background: #004a99; color: white; padding: 12px; border: 1px solid #ddd; }
-        #logsTable td { padding: 10px; border: 1px solid #eee; font-size: 0.9rem; color: #333; }
-        
-        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; box-sizing: border-box; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        #logsTable { width: 100%; border-collapse: collapse; direction: rtl; }
+        #logsTable th { background: #004a99; color: white; padding: 12px; font-size: 0.9rem; }
+        #logsTable td { padding: 10px; border-bottom: 1px solid #f1f5f9; text-align: center; }
+
+        .btn-pdf { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -87,56 +106,44 @@
     </header>
 
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
-    
-    <div class="sidebar" id="sidebar">
-        <div style="text-align:center; padding:30px; background: #f8fafc;">
-            <img src="Brega.PNG" width="85">
-            <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
-        </div>
-        <div class="nav-link" onclick="closeNav()">الرئيسية</div>
-        <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
-        <div class="nav-link" onclick="logout()" style="color:var(--danger); margin-top:auto;">تسجيل الخروج</div>
+    <div class="sidebar" id="sidebar" style="position:fixed; top:0; right:-300px; width:280px; height:100%; background:white; z-index:2000; transition:0.4s; box-shadow:-5px 0 15px rgba(0,0,0,0.1);">
+        <div style="padding:30px; text-align:center;"><img src="Brega.PNG" width="80"></div>
+        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="closeNav()">الرئيسية</div>
+        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="openLogs()">سجل الحركات</div>
     </div>
 
     <div class="container"><div class="grid" id="tanksGrid"></div></div>
 
     <div id="logsModal" class="modal">
-        <div class="m-box" style="max-width: 800px; height: 85vh; overflow: hidden; display: flex; flex-direction: column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="margin:0; color:var(--primary);">تقرير حركة الخزانات اليومي</h3>
-                <button id="pdfBtn" onclick="downloadPDF()" style="background:var(--success); color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">تحميل تقرير PDF</button>
+        <div class="m-box">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <h3 style="margin:0;">سجل حركة الخزانات</h3>
+                <button class="btn-pdf" id="pdfBtn" onclick="downloadPDF()">تحميل PDF</button>
             </div>
-            
-            <div id="captureArea" style="background: white; padding: 20px; flex-grow: 1; overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 15px; border-bottom: 2px solid #004a99; padding-bottom: 10px;">
-                    <h2 style="color:#004a99; margin:0;">شركة البريقة لتسويق النفط</h2>
-                    <p style="margin:5px 0; color:#666;">كشف تفصيلي بحركة المنتجات النفطية</p>
-                </div>
+            <div id="captureArea" style="background:white; padding:15px; max-height:60vh; overflow-y:auto;">
                 <table id="logsTable">
                     <thead>
                         <tr>
-                            <th>التوقيت والتاريخ</th>
-                            <th>اسم الخزان</th>
-                            <th>الوارد (+)</th>
-                            <th>المنصرف (-)</th>
+                            <th>التاريخ</th>
+                            <th>الخزان</th>
+                            <th>وارد (+)</th>
+                            <th>منصرف (-)</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
                 </table>
             </div>
-            
-            <button onclick="closeLogs()" style="width:100%; margin-top:20px; padding:12px; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق</button>
+            <button onclick="closeLogs()" style="width:100%; margin-top:15px; padding:10px; border:none; background:#eee; border-radius:8px; cursor:pointer;">إغلاق</button>
         </div>
     </div>
 
     <div id="editModal" class="modal">
-        <div class="m-box">
-            <h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">تحديث بيانات التشغيل</h3>
-            <label>كمية الشحن (وارد +)</label><input type="number" id="inQ" placeholder="0">
-            <label>كمية الصرف (منصرف -)</label><input type="number" id="outQ" placeholder="0">
-            <label>درجة الحرارة الحالية (°C)</label><input type="number" id="tempQ" step="0.1">
-            <button class="btn-save" onclick="saveData()">تأكيد وحفظ</button>
-            <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#64748b; margin-top:15px; cursor:pointer">إلغاء</button>
+        <div class="m-box" style="max-width:400px;">
+            <h3 style="text-align:center;">تحديث البيانات</h3>
+            <label>وارد +</label><input type="number" id="inQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
+            <label>منصرف -</label><input type="number" id="outQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
+            <label>الحرارة</label><input type="number" id="tempQ" style="width:100%; padding:10px; margin:10px 0; border:1px solid #ddd; border-radius:5px;">
+            <button onclick="saveData()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">حفظ التغييرات</button>
         </div>
     </div>
 
@@ -156,8 +163,8 @@
         const db = getDatabase(app);
         let allTanks = [];
 
-        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
+        window.openNav = () => { document.getElementById('sidebar').style.right = '0'; }
+        window.closeNav = () => { document.getElementById('sidebar').style.right = '-300px'; }
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
 
@@ -173,60 +180,43 @@
 
                 container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div class="temp-text">🌡️ ${t.temp}°C</div>
+                        <div class="temp-badge">🌡️ ${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
-                        <div class="tank-wrapper">
-                            <div class="fuel-fill ${status}" style="height:${percent}%"></div>
+                        <div class="cylindrical-tank">
+                            <div class="tank-ladder"></div>
+                            <div class="tank-rings"></div>
+                            <div class="fuel-level ${status}" style="height:${percent}%"></div>
                         </div>
-                        <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="percent-label">${percent.toFixed(1)}% ممتلئ</div>
+                        <div class="qty-display">${Math.round(t.qty).toLocaleString()} L</div>
+                        <div class="percent-display">${percent.toFixed(1)}% ممتلئ</div>
                     </div>`;
             });
         });
 
         onValue(ref(db, 'logs'), (snap) => {
             const logs = Object.values(snap.val() || {}).reverse();
-            document.getElementById('logsBody').innerHTML = logs.slice(0, 50).map(l => `
+            document.getElementById('logsBody').innerHTML = logs.slice(0, 30).map(l => `
                 <tr>
-                    <td style="direction:ltr; text-align:right;">${l.time}</td>
+                    <td style="font-size:0.7rem;">${l.time}</td>
                     <td style="font-weight:bold;">${l.tankName}</td>
-                    <td style="color:green; font-weight:bold;">+${l.added.toLocaleString()}</td>
-                    <td style="color:red; font-weight:bold;">-${l.subbed.toLocaleString()}</td>
+                    <td style="color:green;">+${l.added}</td>
+                    <td style="color:red;">-${l.subbed}</td>
                 </tr>
             `).join('');
         });
 
-        // وظيفة الـ PDF المطورة لدعم العربية
         window.downloadPDF = () => {
-            const btn = document.getElementById('pdfBtn');
-            btn.innerText = "جاري الحفظ...";
-            btn.disabled = true;
-
             const element = document.getElementById('captureArea');
-            const { jsPDF } = window.jspdf;
-
-            html2canvas(element, { 
-                scale: 3, // دقة عالية جداً للخطوط
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            }).then(canvas => {
+            html2canvas(element, { scale: 3 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const imgProps = pdf.getImageProperties(imgData);
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
-                pdf.save('تقرير_شركة_البريقة.pdf');
-                
-                btn.innerText = "تحميل تقرير PDF";
-                btn.disabled = false;
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                pdf.text("Brega Petroleum - Tanks Report", 105, 15, { align: "center" });
+                pdf.addImage(imgData, 'PNG', 10, 25, 190, (canvas.height * 190) / canvas.width);
+                pdf.save('Report.pdf');
             });
         }
 
         window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
-        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
-        
         window.saveData = () => {
             const idx = allTanks.findIndex(x => x.id === window.currId);
             const inVal = parseFloat(document.getElementById('inQ').value) || 0;
@@ -236,20 +226,9 @@
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
             
-            push(ref(db, 'logs'), { 
-                time: new Date().toLocaleString('ar-LY'), 
-                tankName: allTanks[idx].name, 
-                added: inVal, 
-                subbed: outVal 
-            });
-            set(ref(db, 'tanks'), allTanks).then(() => {
-                closeEdit();
-                document.getElementById('inQ').value = '';
-                document.getElementById('outQ').value = '';
-            });
+            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal });
+            set(ref(db, 'tanks'), allTanks).then(() => { document.getElementById('editModal').style.display = 'none'; });
         }
-
-        window.logout = () => { window.location.replace("index.html"); }
     </script>
 </body>
 </html>
