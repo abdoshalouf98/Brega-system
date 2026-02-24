@@ -19,7 +19,8 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; 
         }
 
-        .logo { width: 100px; margin-bottom: 25px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+        /* تعديل حجم الصورة لتظهر بشكل متناسق */
+        .logo { width: 120px; height: auto; margin-bottom: 25px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
         
         h2 { color: var(--dark); margin-bottom: 35px; font-weight: 800; font-size: 1.6rem; }
 
@@ -56,7 +57,8 @@
 </head>
 <body>
     <div class="login-card">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Brega_Petroleum_Marketing_Company_Logo.png/150px-Brega_Petroleum_Marketing_Company_Logo.png" class="logo">
+        <img src="Brega.PNG" class="logo" alt="شعار شركة البريقة">
+        
         <h2>منظومة تتبع الخزانات</h2>
         
         <div class="input-group">
@@ -102,6 +104,7 @@
                   p = document.getElementById('password').value, 
                   e = document.getElementById('errorMessage');
 
+            // الأرقام الوظيفية المسموح لها بالدخول
             if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
                 localStorage.setItem("currentUser", u); 
                 window.location.href = "dashboard.html";
