@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم | شركة البريقة</title>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root { 
-            --primary: #004a99; --bg: #f8fafc; 
+            --primary: #004a99; --bg: #f0f2f5; 
             --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
+            --metal-dark: #cbd5e1; --metal-light: #f8fafc;
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
@@ -19,10 +18,13 @@
         .header-container {
             background: white; padding: 10px 5%; text-align: center;
             border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px;
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px; /* زيادة الطول لاستيعاب الصورة */
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
+        
+        /* تعديل حجم الصورة لتكون متوسطة */
         .header-logo { width: 90px; height: auto; margin-bottom: 5px; } 
+        
         .header-title { margin: 5px 0 0 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         .menu-btn { 
@@ -32,109 +34,127 @@
         }
 
         .container { padding: 160px 5% 40px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
-        /* تصميم الخزان الأسطواني */
+        /* كرت الخزان الواقعي */
         .tank-card { 
-            background: white; border-radius: 20px; padding: 20px; text-align: center; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s;
+            background: white; border-radius: 15px; padding: 25px 20px; text-align: center; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
             border: 1px solid #e2e8f0; position: relative;
         }
-        .temp-badge { font-size: 0.75rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 4px 10px; border-radius: 20px; border: 1px solid #cbd5e1; }
-        .tank-name { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; color: #1e293b; }
+        .tank-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        
+        .temp-text { font-size: 0.85rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; }
+        .tank-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; color: #1e293b; }
 
-        .cylindrical-tank {
-            width: 140px; height: 160px; margin: 0 auto 20px;
-            position: relative;
-            background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 20%, #ffffff 50%, #f1f5f9 80%, #94a3b8 100%);
-            border: 3px solid #94a3b8; border-radius: 10px 10px 5px 5px; overflow: hidden;
+        .tank-wrapper {
+            width: 130px; height: 170px; margin: 10px auto 25px;
+            position: relative; 
+            background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 50%, #94a3b8 100%);
+            border: 2px solid #64748b; border-radius: 15px 15px 8px 8px;
+            box-shadow: inset -5px 0 15px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        .tank-rings { position: absolute; inset: 0; background-image: linear-gradient(transparent 19%, #94a3b8 20%, #94a3b8 21%, transparent 22%); background-size: 100% 40px; z-index: 3; }
-        .tank-ladder { position: absolute; left: 15px; top: 0; bottom: 0; width: 15px; border-left: 2px solid #64748b; border-right: 2px solid #64748b; background-image: linear-gradient(#64748b 2px, transparent 2px); background-size: 100% 15px; z-index: 4; opacity: 0.6; }
 
-        .fuel-level { position: absolute; bottom: 0; left: 0; width: 100%; transition: height 1s; z-index: 2; }
-        .status-danger { background: linear-gradient(90deg, #b91c1c 0%, #ef4444 50%, #b91c1c 100%); }
-        .status-warning { background: linear-gradient(90deg, #d97706 0%, #fbbf24 50%, #d97706 100%); }
-        .status-success { background: linear-gradient(90deg, #059669 0%, #34d399 50%, #059669 100%); }
+        .tank-wrapper::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 12px;
+            background: #64748b; border-bottom: 2px solid #475569; z-index: 5;
+        }
 
-        .qty-display { font-size: 1.6rem; font-weight: 900; color: #0f172a; margin: 0; }
+        .tank-legs {
+            width: 100px; height: 12px; background: #334155; margin: -26px auto 15px;
+            border-radius: 2px; position: relative; z-index: 1;
+        }
 
-        /* مودال السجلات وجدول الكشف */
+        .fuel-fill { 
+            position: absolute; bottom: 0; width: 100%; 
+            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 2; opacity: 0.9;
+        }
+        
+        .fuel-top {
+            position: absolute; top: 0; width: 100%; height: 8px;
+            background: rgba(255,255,255,0.3); border-top: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .tank-measure {
+            position: absolute; right: 8px; top: 20px; bottom: 10px; width: 10px;
+            border-right: 2px solid rgba(0,0,0,0.1);
+            background: repeating-linear-gradient(0deg, #475569 0px, #475569 1px, transparent 1px, transparent 10px);
+            z-index: 4;
+        }
+
+        .status-danger { background: linear-gradient(180deg, #f87171, #dc2626); }
+        .status-warning { background: linear-gradient(180deg, #fbbf24, #d97706); }
+        .status-success { background: linear-gradient(180deg, #34d399, #059669); }
+
+        .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
+        .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
+
+        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .sidebar.active { right: 0; }
+        .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
+        .logout-btn { color: var(--danger); border-top: 1px solid #eee; margin-top: auto; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
+        .overlay.active { display: block; }
+
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
-        .m-box { background: white; width: 100%; max-width: 850px; padding: 25px; border-radius: 20px; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
-        
-        #captureArea { background: white; padding: 20px; overflow-y: auto; flex-grow: 1; border: 1px solid #eee; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #004a99; color: white; padding: 12px; font-size: 0.95rem; border: 1px solid #003366; }
-        td { padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold; font-size: 0.9rem; }
-
-        /* زر التحميل الجديد */
-        .btn-download-main {
-            background: #10b981; color: white; border: none; padding: 12px 25px;
-            border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem;
-            display: flex; align-items: center; gap: 8px; transition: 0.2s;
-        }
-        .btn-download-main:active { transform: scale(0.95); }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
-        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; }
+        .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; }
     </style>
 </head>
 <body>
 
     <header class="header-container">
         <button class="menu-btn" onclick="openNav()">القائمة</button>
-        <img src="Brega.PNG" class="header-logo" alt="Logo">
+        <img src="Brega.PNG" class="header-logo" onerror="this.src='https://via.placeholder.com/90x90?text=Brega'">
         <h1 class="header-title">شركة البريقة لتسويق النفط</h1>
     </header>
 
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
+    
     <div class="sidebar" id="sidebar">
-        <div style="padding:30px; text-align:center;"><img src="Brega.PNG" width="80"></div>
-        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="closeNav()">الرئيسية</div>
-        <div style="padding:15px 25px; font-weight:bold; cursor:pointer; border-bottom:1px solid #eee;" onclick="openLogs()">سجل الحركات (الكشف)</div>
+        <div style="text-align:center; padding:30px; background: #f8fafc;">
+            <img src="Brega.PNG" width="80" onerror="this.src='https://via.placeholder.com/80'">
+            <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
+        </div>
+        <div class="nav-link" onclick="closeNav()">الرئيسية (الخزانات)</div>
+        <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
+        <div class="nav-link logout-btn" onclick="logout()">تسجيل الخروج</div>
     </div>
 
-    <div class="container"><div class="grid" id="tanksGrid"></div></div>
+    <div class="container">
+        <div class="grid" id="tanksGrid"></div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="m-box">
+            <h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">تحديث بيانات التشغيل</h3>
+            <label>كمية الشحن (وارد +)</label><input type="number" id="inQ" placeholder="0">
+            <label>كمية الصرف (منصرف -)</label><input type="number" id="outQ" placeholder="0">
+            <label>درجة الحرارة الحالية (°C)</label><input type="number" id="tempQ" step="0.1" placeholder="مثلاً 25.5">
+            <button class="btn-save" onclick="saveData()" style="background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد العملية</button>
+            <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#64748b; margin-top:15px; cursor:pointer">إلغاء وإغلاق</button>
+        </div>
+    </div>
 
     <div id="logsModal" class="modal">
-        <div class="m-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 style="margin:0; color:var(--primary);">كشف حركة الخزانات اليومي</h3>
-                <button class="btn-download-main" id="pdfBtn" onclick="downloadPDF()">
-                    📥 تحميل الكشف
-                </button>
+        <div class="m-box" style="max-width: 900px; height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0">سجل حركات الخزانات اليومي</h3>
+                <button onclick="downloadPDF()" style="background:var(--success); color:white; border:none; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">تحميل PDF</button>
             </div>
-
-            <div id="captureArea">
-                <div style="text-align:center; border-bottom:2px solid #004a99; padding-bottom:10px; margin-bottom:15px;">
-                    <h2 style="margin:0; color:#004a99;">Brega Petroleum - Tanks Report</h2>
-                </div>
-                <table id="logsTable">
-                    <thead>
-                        <tr>
-                            <th style="width: 25%;">التاريخ</th>
-                            <th style="width: 25%;">الخزان</th>
-                            <th style="width: 25%;">وارد (+)</th>
-                            <th style="width: 25%;">منصرف (-)</th>
+            <div style="overflow-y:auto; flex-grow:1;">
+                <table id="logsTable" style="width:100%; border-collapse:collapse; text-align:center;">
+                    <thead style="position:sticky; top:0; background:#f8fafc;">
+                        <tr style="border-bottom:2px solid #e2e8f0;">
+                            <th style="padding:12px;">التوقيت</th><th>اسم الخزان</th><th>الوارد</th><th>المنصرف</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
                 </table>
             </div>
-            
-            <button onclick="closeLogs()" style="width:100%; margin-top:15px; padding:12px; border:none; background:#f1f5f9; color:#475569; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق النافذة</button>
-        </div>
-    </div>
-
-    <div id="editModal" class="modal">
-        <div class="m-box" style="max-width:400px;">
-            <h3 style="text-align:center; color:var(--primary);">تحديث بيانات التشغيل</h3>
-            <label>كمية واردة (+)</label><input type="number" id="inQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-            <label>كمية منصرفة (-)</label><input type="number" id="outQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-            <label>درجة الحرارة</label><input type="number" id="tempQ" style="width:100%; padding:12px; margin:10px 0; border:1px solid #ddd; border-radius:8px;">
-            <button onclick="saveData()" style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:1.1rem;">تأكيد وحفظ</button>
+            <button onclick="closeLogs()" style="width:100%; margin-top:20px; padding:12px; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق السجل</button>
         </div>
     </div>
 
@@ -153,103 +173,79 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let allTanks = [];
+        const user = localStorage.getItem("currentUser") || "Admin";
 
-        window.openNav = () => { document.getElementById('sidebar').style.right = '0'; document.getElementById('overlay').style.display = 'block'; }
-        window.closeNav = () => { document.getElementById('sidebar').style.right = '-300px'; document.getElementById('overlay').style.display = 'none'; }
+        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
+        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
 
         onValue(ref(db, 'tanks'), (snap) => {
-            allTanks = Object.values(snap.val() || {});
+            const data = snap.val();
+            allTanks = data ? Object.values(data) : [];
             const container = document.getElementById('tanksGrid');
             container.innerHTML = '';
+
             allTanks.forEach(t => {
-                const percent = Math.min(100, (t.qty / t.cap) * 100);
-                let status = (percent < 20) ? 'status-danger' : (percent < 50) ? 'status-warning' : 'status-success';
+                const percent = Math.min(100, Math.max(0, (t.qty / t.cap) * 100));
+                let statusClass = 'status-success';
+                if (percent < 15) statusClass = 'status-danger';
+                else if (percent < 40) statusClass = 'status-warning';
+
                 container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div class="temp-badge">🌡️ ${t.temp}°C</div>
+                        <div class="temp-text">🌡️ ${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
-                        <div class="cylindrical-tank">
-                            <div class="tank-ladder"></div><div class="tank-rings"></div>
-                            <div class="fuel-level ${status}" style="height:${percent}%"></div>
+                        <div class="tank-wrapper">
+                            <div class="tank-measure"></div>
+                            <div class="fuel-fill ${statusClass}" style="height:${percent}%">
+                                <div class="fuel-top"></div>
+                            </div>
                         </div>
-                        <div class="qty-display">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div style="color:#64748b; font-weight:bold;">${percent.toFixed(1)}% ممتلئ</div>
+                        <div class="tank-legs"></div>
+                        <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
+                        <div class="percent-label">${percent.toFixed(1)}% ممتلئ</div>
                     </div>`;
             });
         });
 
         onValue(ref(db, 'logs'), (snap) => {
             const logs = Object.values(snap.val() || {}).reverse();
-            document.getElementById('logsBody').innerHTML = logs.slice(0, 40).map(l => `
-                <tr>
-                    <td style="font-size:0.75rem; color:#555;">${l.time}</td>
-                    <td>${l.tankName}</td>
-                    <td style="color:#10b981;">+${l.added.toLocaleString()}</td>
-                    <td style="color:#ef4444;">-${l.subbed.toLocaleString()}</td>
+            document.getElementById('logsBody').innerHTML = logs.slice(0, 50).map(l => `
+                <tr style="border-bottom:1px solid #f1f5f9">
+                    <td style="padding:12px; font-size:0.85rem; color:#64748b;">${l.time}</td>
+                    <td style="font-weight:bold;">${l.tankName}</td>
+                    <td style="color:var(--success); font-weight:bold;">+${l.added}</td>
+                    <td style="color:var(--danger); font-weight:bold;">-${l.subbed}</td>
                 </tr>
             `).join('');
         });
 
-        // وظيفة التحميل المحسنة للهواتف والكمبيوتر
-        window.downloadPDF = () => {
-            const btn = document.getElementById('pdfBtn');
-            const element = document.getElementById('captureArea');
-            
-            btn.innerText = "جاري التحميل...";
-            btn.style.opacity = "0.7";
-
-            html2canvas(element, { 
-                scale: 3, 
-                useCORS: true,
-                logging: false,
-                allowTaint: true
-            }).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const imgWidth = 190;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-                
-                // حفظ الملف باسم يحتوي على التاريخ
-                const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
-                pdf.save(`كشف_البريقة_${dateStr}.pdf`);
-                
-                btn.innerText = "📥 تحميل الكشف";
-                btn.style.opacity = "1";
-            }).catch(err => {
-                alert("حدث خطأ أثناء التحميل، حاول مرة أخرى.");
-                btn.innerText = "📥 تحميل الكشف";
-                btn.style.opacity = "1";
-            });
-        }
-
         window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.closeEdit = () => { 
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
         window.saveData = () => {
             const idx = allTanks.findIndex(x => x.id === window.currId);
             const inVal = parseFloat(document.getElementById('inQ').value) || 0;
             const outVal = parseFloat(document.getElementById('outQ').value) || 0;
             const tempVal = parseFloat(document.getElementById('tempQ').value);
-            
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
-            
-            push(ref(db, 'logs'), { 
-                time: new Date().toLocaleString('ar-LY'), 
-                tankName: allTanks[idx].name, 
-                added: inVal, 
-                subbed: outVal 
-            });
-            set(ref(db, 'tanks'), allTanks).then(() => {
-                document.getElementById('editModal').style.display = 'none';
-                document.getElementById('inQ').value = '';
-                document.getElementById('outQ').value = '';
-            });
+            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal, user: user });
+            set(ref(db, 'tanks'), allTanks).then(closeEdit);
         }
+
+        window.downloadPDF = () => { 
+            const { jsPDF } = window.jspdf; 
+            const doc = new jsPDF(); 
+            doc.text("Brega Petroleum - Tanks Report", 14, 15);
+            doc.autoTable({ html: '#logsTable', margin: {top: 25} }); 
+            doc.save('Brega_Report.pdf'); 
+        }
+        
+        window.logout = () => { localStorage.clear(); window.location.replace("index.html"); }
     </script>
 </body>
 </html>
