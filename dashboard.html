@@ -89,10 +89,22 @@
         .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
         .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
 
-        /* القائمة الجانبية */
-        .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        /* القائمة الجانبية المعدلة */
+        .sidebar { 
+            position: fixed; top: 0; right: -300px; width: 280px; height: 100%; 
+            background: white; z-index: 2000; transition: 0.4s; 
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
+            display: flex; flex-direction: column; 
+        }
         .sidebar.active { right: 0; }
+        .nav-content { flex-grow: 1; overflow-y: auto; }
         .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-decoration: none; }
+        .nav-link:hover { background: #f8fafc; }
+        
+        /* تذييل القائمة لزر تسجيل الخروج */
+        .sidebar-footer { border-top: 2px solid #f1f5f9; padding: 10px 0; background: #fff; }
+        .logout-link { color: var(--danger) !important; border-bottom: none !important; }
+
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
@@ -133,10 +145,16 @@
             <img src="Brega.PNG" width="80" onerror="this.src='https://via.placeholder.com/80'">
             <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
         </div>
-        <div class="nav-link" onclick="location.reload(true)" style="color:var(--success)">تحديث البيانات 🔄</div>
-        <div class="nav-link" onclick="closeNav()">الرئيسية</div>
-        <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
-        <div class="nav-link" onclick="localStorage.clear(); location.reload();" style="color:var(--danger)">تسجيل الخروج</div>
+        
+        <div class="nav-content">
+            <div class="nav-link" onclick="location.reload(true)" style="color:var(--success)">تحديث البيانات 🔄</div>
+            <div class="nav-link" onclick="closeNav()">الرئيسية</div>
+            <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="nav-link logout-link" onclick="localStorage.clear(); location.reload();">تسجيل الخروج ⬅️</div>
+        </div>
     </div>
 
     <div class="container">
@@ -195,7 +213,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js?v=1.0";
         import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js?v=1.0";
 
-        // ملاحظة: يجب تغيير هذا المفتاح كما أخبرتك لأنه مسرب!
         const firebaseConfig = {
             apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
             authDomain: "brega-system.firebaseapp.com",
