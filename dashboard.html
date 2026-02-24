@@ -3,178 +3,605 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم | شركة البريقة</title>
+    <title>منظومة شركة البريقة المتكاملة - النسخة الاحترافية</title>
     
     <style>
+        /* --- المتغيرات اللونية والهوية البصرية --- */
         :root { 
-            --primary: #004a99; --bg: #f0f2f5; 
-            --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
-            --metal-dark: #cbd5e1; --metal-light: #f8fafc;
-        }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
-        
-        .header-container {
-            background: white; padding: 50px 5%; text-align: center;
-            border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        
-        .header-logo { width: 200px; height: auto; margin-bottom: 5px; } 
-        .header-title { margin: 5px 0 0 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
-
-        .menu-btn { 
-            position: absolute; right: 30px; top: 20%; transform: translateY(-50%);
-            background: white; border: 2px solid var(--primary); color: var(--primary); 
-            padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600;
+            --brega-blue: #004a99; 
+            --brega-red: #a51c24;
+            --brega-green: #22c55e;
+            --brega-gold: #b08d57;
+            --bg-light: #f4f7f9;
+            --white: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-hard: 0 15px 45px rgba(0,0,0,0.12);
+            --radius-xl: 40px;
+            --radius-md: 18px;
         }
 
-        .container { padding: 160px 5% 40px 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
-
-        /* --- تنسيق القائمة الجانبية المطور --- */
-        .sidebar { 
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%; 
-            background: white; z-index: 2000; transition: 0.4s; 
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
-            display: flex; flex-direction: column; /* تفعيل نظام الفليكس */
-        }
-        .sidebar.active { right: 0; }
-        
-        .nav-link { 
-            padding: 18px 25px; display: block; color: var(--primary); 
-            font-weight: bold; text-align: right; cursor: pointer; 
-            border-bottom: 1px solid #f1f5f9; text-decoration: none; 
+        /* --- الإعدادات العامة للمتصفح --- */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* عنصر الفراغ لدفع الزر للأسفل */
-        .sidebar-spacer { flex-grow: 1; }
-
-        /* زر تسجيل الخروج في الأسفل */
-        .logout-link { 
-            background: #fff1f2; 
-            border-top: 2px solid #fee2e2 !important; 
-            color: var(--danger) !important;
-            margin-top: auto;
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark);
+            direction: rtl; 
+            overflow-x: hidden; 
+            line-height: 1.6;
         }
-        .logout-link:hover { background: #fee2e2; }
 
-        /* بقية التنسيقات */
-        .tank-card { background: white; border-radius: 15px; padding: 25px 20px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; border: 1px solid #e2e8f0; position: relative; }
-        .temp-text { font-size: 1rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; }
-        .tank-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; color: #1e293b; }
-        .tank-wrapper { width: 130px; height: 170px; margin: 10px auto 25px; position: relative; background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 50%, #94a3b8 100%); border: 2px solid #64748b; border-radius: 15px 15px 8px 8px; box-shadow: inset -5px 0 15px rgba(0,0,0,0.1); overflow: hidden; }
-        .tank-wrapper::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 12px; background: #64748b; border-bottom: 2px solid #475569; z-index: 5; }
-        .tank-legs { width: 100px; height: 12px; background: #334155; margin: -26px auto 15px; border-radius: 2px; position: relative; z-index: 1; }
-        .fuel-fill { position: absolute; bottom: 0; width: 100%; transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2; opacity: 0.9; }
-        .fuel-top { position: absolute; top: 0; width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-top: 2px solid rgba(255,255,255,0.5); }
-        .tank-measure { position: absolute; right: 8px; top: 20px; bottom: 10px; width: 10px; border-right: 2px solid rgba(0,0,0,0.1); background: repeating-linear-gradient(0deg, #475569 0px, #475569 1px, transparent 1px, transparent 10px); z-index: 4; }
-        .status-danger { background: linear-gradient(180deg, #f87171, #dc2626); }
-        .status-warning { background: linear-gradient(180deg, #fbbf24, #d97706); }
-        .status-success { background: linear-gradient(180deg, #34d399, #059669); }
-        .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
-        .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
-        .overlay.active { display: block; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
-        .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; box-sizing: border-box; }
+        /* منع التمرير عند فتح القائمة الجانبية */
+        body.no-scroll { overflow: hidden; }
 
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body * { visibility: hidden; }
-            #logsModal, #logsModal * { visibility: visible; }
-            #logsModal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; background: white; padding: 0; }
-            #logsModal button, .menu-btn, .filter-section { display: none !important; }
-            .m-box { max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
-            table { width: 100% !important; border-collapse: collapse; margin-top: 10px; font-size: 10pt; }
-            th, td { border: 1px solid #000 !important; padding: 8px; text-align: center; color: black !important; }
-            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
-            .header-container, .sidebar { display: none !important; }
+        /* --- الهيدر (Header) --- */
+        .app-header {
+            background: var(--white);
+            height: 95px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 6%;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1200;
+            border-bottom: 5px solid var(--brega-blue);
+            box-shadow: 0 3px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo-container img {
+            height: 75px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .menu-toggle-btn {
+            background: var(--white);
+            border: 2px solid var(--brega-blue);
+            color: var(--brega-blue);
+            padding: 12px 28px;
+            border-radius: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(0,74,153,0.1);
+        }
+
+        .menu-toggle-btn:hover {
+            background: var(--brega-blue);
+            color: var(--white);
+            transform: scale(1.05);
+        }
+
+        /* --- القائمة الجانبية (Side Drawer) --- */
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: -340px;
+            width: 320px;
+            height: 100vh;
+            background: var(--white);
+            z-index: 2100;
+            box-shadow: -15px 0 50px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+        }
+
+        .side-drawer.open { right: 0; }
+
+        .drawer-brand-section {
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+        }
+
+        .drawer-nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-link-item {
+            padding: 22px 35px;
+            color: var(--brega-blue);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid #f8fafc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+        }
+
+        .nav-link-item:hover {
+            background: #f1f5f9;
+            padding-right: 45px;
+            color: var(--brega-gold);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .drawer-overlay.visible { display: block; }
+
+        /* --- الحاوية الرئيسية --- */
+        .page-main-content {
+            padding: 140px 6% 60px 6%;
+            min-height: 100vh;
+        }
+
+        /* --- قسم الاتجاه المستقبلي (Strategic Section) --- */
+        .section-display-title {
+            text-align: center;
+            font-size: 2.2rem;
+            color: var(--text-dark);
+            margin-bottom: 70px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- شبكة البطاقات الثلاث (توحيد الأحجام) --- */
+        .strategic-flex-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 80px; /* تباعد كافي لظهور الأيقونات */
+            align-items: center;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .card-unified {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 70px 40px 50px; /* مساحات واسعة */
+            position: relative;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            width: 100%;
+            /* تحديد ارتفاع أدنى كبير لضمان التساوي */
+            min-height: 380px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* ترتيب العناصر من الأعلى */
+            border-top: 10px solid transparent;
+        }
+
+        .card-unified:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hard);
+        }
+
+        /* تصميم الدائرة العلوية (الأيقونة) */
+        .card-floating-icon {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 45px;
+            border: 8px solid var(--white);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+
+        .card-unified h3 {
+            font-size: 1.9rem;
+            margin-bottom: 25px;
+            color: #334155;
+            font-weight: 900;
+        }
+
+        .card-unified p {
+            line-height: 2.3;
+            color: #475569;
+            font-size: 1.15rem;
+            margin-bottom: 20px;
+        }
+
+        /* --- تصميم قائمة القيم (مطابق لطلبك) --- */
+        .values-grid-container {
+            margin-top: auto; /* يدفع القائمة لأسفل البطاقة */
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .value-row-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 18px 25px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: var(--text-dark);
+            border: 1px solid #f1f5f9;
+        }
+
+        .value-row-item:hover {
+            background: #f1f5f9;
+        }
+
+        .status-check-badge {
+            background: var(--brega-green);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* --- خارطة الطريق (الأسهم) --- */
+        .roadmap-main-box {
+            margin-top: 120px;
+            text-align: center;
+        }
+
+        .roadmap-flex-steps {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .step-block {
+            width: 200px;
+            padding: 30px 15px;
+            border-radius: 20px;
+            color: var(--white);
+            font-weight: 900;
+            font-size: 0.95rem;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            cursor: default;
+        }
+
+        /* --- صفحة مراقبة الخزانات (tanksSection) --- */
+        #tanks-view-container { display: none; }
+
+        .tanks-stack-list {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .tank-white-card-full {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            padding: 35px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 35px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid #f1f5f9;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tank-white-card-full:active {
+            transform: scale(0.98);
+        }
+
+        /* تصميم الخزان الكروي */
+        .tank-visual-sphere-box {
+            width: 160px;
+            height: 160px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sphere-outer-shell {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ffffff, #e2e8f0);
+            border: 5px solid #cbd5e1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset -10px -10px 30px rgba(0,0,0,0.06), 0 12px 24px rgba(0,0,0,0.1);
+        }
+
+        .fuel-level-indicator {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(to top, #166534, #22c55e);
+            transition: height 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+        }
+
+        .brand-logo-center {
+            width: 60px;
+            height: auto;
+            z-index: 5;
+            opacity: 0.85;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.15));
+        }
+
+        .sphere-stairs-detail {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            width: 55px;
+            height: 140px;
+            border-right: 3px solid #94a3b8;
+            border-radius: 0 75px 75px 0;
+            pointer-events: none;
+            z-index: 6;
+        }
+
+        /* البيانات الرقمية بجانب الخزان */
+        .tank-data-display {
+            flex: 1;
+            text-align: right;
+        }
+
+        .data-temp-text { color: #94a3b8; font-size: 1rem; font-weight: 800; margin-bottom: 10px; }
+        .data-tank-name { color: var(--text-dark); font-size: 1.6rem; font-weight: 900; margin-bottom: 6px; }
+        .data-tank-qty { color: #000; font-size: 1.3rem; font-weight: 800; }
+        .data-tank-perc { font-size: 2rem; font-weight: 950; color: var(--brega-blue); margin-top: 8px; }
+
+        /* --- مودل تعديل البيانات --- */
+        .modal-overlay-custom {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-window-card {
+            background: var(--white);
+            width: 90%;
+            max-width: 480px;
+            padding: 50px;
+            border-radius: var(--radius-xl);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.35);
+            text-align: center;
+        }
+
+        .input-styled-field {
+            width: 100%;
+            padding: 18px;
+            margin: 18px 0;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .input-styled-field:focus {
+            border-color: var(--brega-blue);
+            background: #f8fafc;
+        }
+
+        .btn-confirm-update {
+            width: 100%;
+            padding: 20px;
+            background: var(--brega-blue);
+            color: var(--white);
+            border: none;
+            border-radius: 20px;
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-top: 25px;
+            box-shadow: 0 10px 20px rgba(0,74,153,0.2);
+        }
+
+        /* --- سجل الحركات (Logs Fullscreen) --- */
+        .logs-fullscreen-view {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--white);
+            z-index: 4000;
+            padding: 50px 5%;
+            overflow-y: auto;
+        }
+
+        .logs-table-element {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            margin-top: 40px;
+        }
+
+        .logs-table-element th {
+            background: #f8fafc;
+            padding: 20px;
+            font-weight: 900;
+            color: var(--brega-blue);
+            border-bottom: 3px solid #eee;
+        }
+
+        .logs-table-element td {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+            font-weight: 700;
+        }
+
+        /* انيميشن الحركات */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-view { animation: fadeInUp 0.7s ease forwards; }
+
+        /* تجاوب الشاشات */
+        @media (max-width: 800px) {
+            .strategic-flex-layout { gap: 60px; }
+            .card-unified { width: 95%; min-height: auto; padding: 60px 25px 35px; }
+            .roadmap-flex-steps { flex-direction: column; align-items: center; }
+            .step-block { width: 90%; }
+            .tank-white-card-full { flex-direction: column; text-align: center; padding: 40px 20px; }
+            .tank-data-display { text-align: center; }
+            .app-header { height: 85px; padding: 0 4%; }
         }
     </style>
 </head>
 <body>
 
-    <header class="header-container">
-        <button class="menu-btn" onclick="openNav()">القائمة</button>
-        <img src="Brega.PNG" class="header-logo" onerror="this.src='https://via.placeholder.com/90x90?text=Brega'">
-        <h1 class="header-title">شركة البريقة لتسويق النفط</h1>
+    <header class="app-header">
+        <div class="header-right">
+            <button class="menu-toggle-btn" onclick="toggleMainSidebar(true)">القائمة الرئيسية</button>
+        </div>
+        <div class="header-logo-container">
+            <img src="Brega.PNG" alt="Brega Petroleum Marketing Company">
+        </div>
     </header>
 
-    <div class="overlay" id="overlay" onclick="closeNav()"></div>
+    <div class="drawer-overlay" id="ui-backdrop-overlay" onclick="toggleMainSidebar(false)"></div>
     
-    <div class="sidebar" id="sidebar">
-        <div style="text-align:center; padding:30px; background: #f8fafc;">
-            <img src="Brega.PNG" width="80" onerror="this.src='https://via.placeholder.com/80'">
-            <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
+    <aside class="side-drawer" id="app-sidebar-drawer">
+        <div class="drawer-brand-section">
+            <img src="Brega.PNG" width="140">
+            <h3 style="margin-top:20px; color:var(--brega-blue); font-weight:900;">منظومة الإدارة الذكية</h3>
         </div>
-        <div class="nav-link" onclick="closeNav()">الرئيسية</div>
-        <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
+        <nav class="drawer-nav-list">
+            <div class="nav-link-item" onclick="navigationSwitch('future')">🚀 الاتجاه المستقبلي</div>
+            <div class="nav-link-item" onclick="navigationSwitch('tanks')">📊 مراقبة الخزانات</div>
+            <div class="nav-link-item" onclick="openSystemLogs()">📜 سجل الحركات والعمليات</div>
+            <div style="flex-grow: 1; min-height: 100px;"></div>
+            <div class="nav-link-item" onclick="terminateSession()" style="color:var(--brega-red); border-top:1px solid #eee;">🔒 تسجيل الخروج</div>
+        </nav>
+    </aside>
+
+    <main class="page-main-content">
         
-        <div class="sidebar-spacer"></div>
-        
-        <div class="nav-link logout-link" onclick="logout()">
-            تسجيل الخروج
-        </div>
-    </div>
+        <section id="strategic-page-view" class="animate-view">
+            <h1 class="section-display-title">الاتجاه المستقبلي للمؤسسة</h1>
+            
+            <div class="strategic-flex-layout">
+                <article class="card-unified" style="border-top-color: var(--brega-blue);">
+                    <div class="card-floating-icon" style="background: var(--brega-blue);">👁️</div>
+                    <h3>رؤيتنا</h3>
+                    <p>تتطلع أن تكون الشركة الأولى وطنياً والرائدة إقليمياً في مجال الطاقة، مساهماتنا جوهرية في استدامة التنمية الاقتصادية والاجتماعية والبيئية.</p>
+                </article>
 
-    <div class="container">
-        <div class="grid" id="tanksGrid"></div>
-    </div>
+                <article class="card-unified" style="border-top-color: var(--brega-red);">
+                    <div class="card-floating-icon" style="background: var(--brega-red);">📜</div>
+                    <h3>رسالتنا</h3>
+                    <p>نقوم باستيراد وتصنيع وتخزين ومناولة ونقل وتسويق وبيع المشتقات النفطية في السوق الليبي وفقاً للتشريعات وبما يتوافق مع مبادئ الحوكمة المؤسسية ومنهج الإدارة الاستراتيجية.</p>
+                </article>
 
-    <div id="editModal" class="modal">
-        <div class="m-box">
-            <h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">تحديث بيانات التشغيل</h3>
-            <label>كمية الشحن (وارد +)</label><input type="number" id="inQ" placeholder="0">
-            <label>كمية الصرف (منصرف -)</label><input type="number" id="outQ" placeholder="0">
-            <label>درجة الحرارة الحالية (C)</label><input type="number" id="tempQ" step="0.1" placeholder="مثلاً 25.5">
-            <button onclick="saveData()" style="background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد العملية</button>
-            <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#64748b; margin-top:15px; cursor:pointer">إلغاء وإغلاق</button>
-        </div>
-    </div>
+                <article class="card-unified" style="border-top-color: var(--brega-green);">
+                    <div class="card-floating-icon" style="background: var(--brega-green);">🤝</div>
+                    <h3>قيمنا الجوهرية</h3>
+                    <div class="values-grid-container">
+                        <div class="value-row-item">الشفافية والمساءلة <div class="status-check-badge">✓</div></div>
+                        <div class="value-row-item">العدالة والمساواة <div class="status-check-badge">✓</div></div>
+                        <div class="value-row-item">الكفاءة والفاعلية <div class="status-check-badge">✓</div></div>
+                        <div class="value-row-item">الاستدامة البيئية <div class="status-check-badge">✓</div></div>
+                    </div>
+                </article>
+            </div>
 
-    <div id="logsModal" class="modal">
-        <div class="m-box" style="max-width: 1100px; height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap: 10px;">
-                <h3 style="margin:0">كشف حركات الخزانات التفصيلي</h3>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="window.print()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">طباعة</button>
-                    <button onclick="clearAllLogs()" style="background:var(--danger); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حذف الكل</button>
+            <div class="roadmap-main-box">
+                <h2 style="font-weight: 900; color: var(--text-dark); font-size: 1.8rem;">خارطة الطريق نحو الريادة</h2>
+                <div class="roadmap-flex-steps" id="roadmap-dynamic-render">
+                    </div>
+            </div>
+        </section>
+
+        <section id="tanks-view-container">
+            <h1 class="section-display-title">لوحة التحكم والمراقبة (tanksSection)</h1>
+            <div class="tanks-stack-list" id="tanks-live-feed">
                 </div>
-            </div>
+        </section>
+    </main>
 
-            <div class="filter-section" style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: bold; color: var(--primary);">عرض حركات خزان محدد:</label>
-                <select id="tankFilter" onchange="renderLogs()" style="margin-bottom: 0; padding: 8px; width: 200px;">
-                    <option value="all">-- كل الخزانات --</option>
-                </select>
-            </div>
-
-            <div style="overflow-y:auto; flex-grow:1;">
-                <table id="logsTable" style="width:100%; border-collapse:collapse; text-align:center;">
-                    <thead style="position:sticky; top:0; background:#f8fafc; z-index:10;">
-                        <tr style="border-bottom:2px solid #e2e8f0;">
-                            <th style="padding:12px;">التاريخ</th>
-                            <th>الساعة</th>
-                            <th>الخزان</th>
-                            <th>الحرارة</th>
-                            <th>الزيادة (+)</th>
-                            <th>النقصان (-)</th>
-                            <th>المخزون المتبقي</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logsBody"></tbody>
-                </table>
-            </div>
-            <button onclick="closeLogs()" style="width:100%; margin-top:20px; padding:12px; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق السجل</button>
+    <div class="modal-overlay-custom" id="data-edit-modal">
+        <div class="modal-window-card">
+            <h2 id="modal-header-text" style="color: var(--brega-blue); margin-bottom: 30px; font-weight: 900;">تحديث الخزان</h2>
+            
+            <div style="text-align: right; font-weight: 800; margin-bottom: 5px;">الكمية المستلمة (الوارد +)</div>
+            <input type="number" id="input-qty-in" class="input-styled-field" placeholder="0.00 لتر">
+            
+            <div style="text-align: right; font-weight: 800; margin-bottom: 5px;">الكمية المسحوبة (المنصرف -)</div>
+            <input type="number" id="input-qty-out" class="input-styled-field" placeholder="0.00 لتر">
+            
+            <div style="text-align: right; font-weight: 800; margin-bottom: 5px;">درجة الحرارة الحالية (C°)</div>
+            <input type="number" id="input-temperature" class="input-styled-field" step="0.1" placeholder="32.0">
+            
+            <button class="btn-confirm-update" onclick="commitUpdateToCloud()">حفظ البيانات وتحديث المنظومة</button>
+            <p onclick="closeDataModal()" style="margin-top:25px; cursor:pointer; color:var(--text-muted); font-weight:bold;">إلغاء التعديل</p>
         </div>
+    </div>
+
+    <div id="full-logs-viewer" class="logs-fullscreen-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+            <h1 style="font-weight: 900; color: var(--brega-blue);">سجل العمليات اليومي</h1>
+            <button class="menu-toggle-btn" onclick="document.getElementById('full-logs-viewer').style.display='none'">إغلاق السجل</button>
+        </div>
+        <table class="logs-table-element">
+            <thead>
+                <tr>
+                    <th>التوقيت</th>
+                    <th>اسم الخزان</th>
+                    <th>الكمية الواردة</th>
+                    <th>الكمية المنصرفة</th>
+                    <th>الرصيد المتبقي</th>
+                </tr>
+            </thead>
+            <tbody id="logs-data-body">
+                </tbody>
+        </table>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+        // إعدادات قاعدة البيانات
         const firebaseConfig = {
             apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
             authDomain: "brega-system.firebaseapp.com",
@@ -185,130 +612,165 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let allTanks = [];
-        let rawLogs = [];
+        let cachedTanks = [];
+        let currentlyEditingId = null;
 
-        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); renderLogs(); }
-        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
-        window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
-        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
-
-        // دالة تسجيل الخروج المحدثة
-        window.logout = () => {
-            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-                localStorage.clear();
-                // تأكد أن اسم ملف صفحة تسجيل الدخول هو login.html أو index.html حسب ما سميته
-                window.location.href = "index.html"; 
+        // وظائف القائمة الجانبية
+        window.toggleMainSidebar = (shouldOpen) => {
+            const sidebar = document.getElementById('app-sidebar-drawer');
+            const overlay = document.getElementById('ui-backdrop-overlay');
+            if(shouldOpen) {
+                sidebar.classList.add('open');
+                overlay.classList.add('visible');
+                document.body.classList.add('no-scroll');
+            } else {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('visible');
+                document.body.classList.remove('no-scroll');
             }
-        }
+        };
 
-        onValue(ref(db, 'tanks'), (snap) => {
-            allTanks = snap.val() ? Object.values(snap.val()) : [];
-            const container = document.getElementById('tanksGrid');
-            const filterSelect = document.getElementById('tankFilter');
+        // التنقل بين الصفحات
+        window.navigationSwitch = (targetPage) => {
+            const stratView = document.getElementById('strategic-page-view');
+            const tanksView = document.getElementById('tanks-view-container');
             
-            container.innerHTML = '';
-            const currentFilter = filterSelect.value;
-            filterSelect.innerHTML = '<option value="all">-- كل الخزانات --</option>';
+            if(targetPage === 'future') {
+                stratView.style.display = 'block';
+                tanksView.style.display = 'none';
+            } else {
+                stratView.style.display = 'none';
+                tanksView.style.display = 'block';
+            }
+            toggleMainSidebar(false);
+        };
 
-            allTanks.forEach(t => {
-                const percent = Math.min(100, Math.max(0, (t.qty / t.cap) * 100));
-                let status = 'status-success';
-                if (percent < 15) status = 'status-danger';
-                else if (percent < 40) status = 'status-warning';
+        // بناء خارطة الطريق برمجياً (لأجل الطول والتنظيم)
+        const roadStepsData = [
+            { label: "1. تحليل الوضع", bg: "#2b4c99" },
+            { label: "2. تحديد الأهداف", bg: "#b82e7a" },
+            { label: "3. وضع الاستراتيجية", bg: "#1e90ff" },
+            { label: "4. مرحلة التنفيذ", bg: "#228b22" },
+            { label: "5. التقييم المستمر", bg: "#ffb142" }
+        ];
 
-                container.innerHTML += `
-                    <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div class="temp-text">${t.temp} C</div>
-                        <div class="tank-name">${t.name}</div>
-                        <div class="tank-wrapper">
-                            <div class="tank-measure"></div>
-                            <div class="fuel-fill ${status}" style="height:${percent}%">
-                                <div class="fuel-top"></div>
+        const roadmapContainer = document.getElementById('roadmap-dynamic-render');
+        roadStepsData.forEach(step => {
+            const div = document.createElement('div');
+            div.className = 'step-block';
+            div.style.backgroundColor = step.bg;
+            div.innerText = step.label;
+            roadmapContainer.appendChild(div);
+        });
+
+        // مراقبة بيانات الخزانات حياً من Firebase
+        const tanksRef = ref(db, 'tanks');
+        onValue(tanksRef, (snapshot) => {
+            cachedTanks = snapshot.val() ? Object.values(snapshot.val()) : [];
+            renderTanksLiveUI();
+        });
+
+        function renderTanksLiveUI() {
+            const feed = document.getElementById('tanks-live-feed');
+            feed.innerHTML = '';
+            
+            cachedTanks.forEach(tank => {
+                const fillRatio = Math.min(100, Math.max(0, (tank.qty / tank.cap) * 100));
+                
+                const cardHtml = `
+                    <div class="tank-white-card-full" onclick="triggerEditModal(${tank.id})">
+                        <div class="tank-visual-sphere-box">
+                            <div class="sphere-outer-shell">
+                                <img src="Brega.PNG" class="brand-logo-center">
+                                <div class="fuel-level-indicator" style="height: ${fillRatio}%"></div>
+                                <div class="sphere-stairs-detail"></div>
                             </div>
                         </div>
-                        <div class="tank-legs"></div>
-                        <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="percent-label">${percent.toFixed(1)}% ممتلئ</div>
-                    </div>`;
-                filterSelect.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+                        <div class="tank-data-display">
+                            <div class="data-temp-text">سجل الحرارة: ${tank.temp || 32.1}°C</div>
+                            <div class="data-tank-name">${tank.name}</div>
+                            <div class="data-tank-qty">${Math.round(tank.qty).toLocaleString()} لتر</div>
+                            <div class="data-tank-perc">${fillRatio.toFixed(1)}%</div>
+                        </div>
+                        <div style="color: #cbd5e1; font-size: 1.5rem;">⚙️</div>
+                    </div>
+                `;
+                feed.innerHTML += cardHtml;
             });
-            filterSelect.value = currentFilter;
-        });
-
-        onValue(ref(db, 'logs'), (snap) => {
-            rawLogs = snap.val() ? Object.values(snap.val()) : [];
-            renderLogs();
-        });
-
-        window.renderLogs = () => {
-            const filterValue = document.getElementById('tankFilter').value;
-            const tbody = document.getElementById('logsBody');
-            const filtered = rawLogs.filter(l => filterValue === 'all' || l.tankName === filterValue).reverse();
-
-            tbody.innerHTML = filtered.map(l => {
-                const datePart = l.dateOnly || (l.time ? l.time.split(' ')[0] : '-');
-                const timePart = l.timeOnly || (l.time ? l.time.split(' ')[1] : '-');
-                
-                return `
-                <tr style="border-bottom:1px solid #f1f5f9">
-                    <td style="padding:10px;">${datePart}</td>
-                    <td>${timePart}</td>
-                    <td style="font-weight:bold;">${l.tankName || 'غير معروف'}</td>
-                    <td>${l.tempAtTime !== undefined ? l.tempAtTime : '-'} C</td>
-                    <td style="color:var(--success); font-weight:bold;">${l.added > 0 ? '+' + l.added.toLocaleString() : '0'}</td>
-                    <td style="color:var(--danger); font-weight:bold;">${l.subbed > 0 ? '-' + l.subbed.toLocaleString() : '0'}</td>
-                    <td style="background:#f8fafc; font-weight:bold;">${l.remQty !== undefined ? Math.round(l.remQty).toLocaleString() : '-'} L</td>
-                </tr>`;
-            }).join('');
         }
 
-        window.saveData = () => {
-            const idx = allTanks.findIndex(x => x.id === window.currId);
-            const inVal = parseFloat(document.getElementById('inQ').value) || 0;
-            const outVal = parseFloat(document.getElementById('outQ').value) || 0;
-            const tempVal = parseFloat(document.getElementById('tempQ').value);
+        // معالجة النافذة المنبثقة للتعديل
+        window.triggerEditModal = (id) => {
+            currentlyEditingId = id;
+            const tank = cachedTanks.find(t => t.id === id);
+            document.getElementById('modal-header-text').innerText = "تحديث " + tank.name;
+            document.getElementById('data-edit-modal').style.display = 'flex';
+        };
+
+        window.closeDataModal = () => {
+            document.getElementById('data-edit-modal').style.display = 'none';
+        };
+
+        window.commitUpdateToCloud = () => {
+            const addValue = parseFloat(document.getElementById('input-qty-in').value) || 0;
+            const subValue = parseFloat(document.getElementById('input-qty-out').value) || 0;
+            const newTemp = parseFloat(document.getElementById('input-temperature').value);
+
+            const tIdx = cachedTanks.findIndex(t => t.id === currentlyEditingId);
+            const targetTank = cachedTanks[tIdx];
+            const finalQty = Math.min(targetTank.cap, Math.max(0, targetTank.qty + addValue - subValue));
+
+            // تسجيل العملية في السجل التاريخي
+            push(ref(db, 'logs'), {
+                timestamp: new Date().toLocaleTimeString('ar-LY'),
+                tankName: targetTank.name,
+                inward: addValue,
+                outward: subValue,
+                balance: finalQty
+            });
+
+            // تحديث البيانات محلياً ثم رفعها
+            cachedTanks[tIdx].qty = finalQty;
+            if(!isNaN(newTemp)) cachedTanks[tIdx].temp = newTemp;
+
+            set(ref(db, 'tanks'), cachedTanks).then(() => {
+                closeDataModal();
+                document.getElementById('input-qty-in').value = '';
+                document.getElementById('input-qty-out').value = '';
+                document.getElementById('input-temperature').value = '';
+            }).catch(e => alert("خطأ في الاتصال: " + e.message));
+        };
+
+        // فتح سجل الحركات
+        window.openSystemLogs = () => {
+            const logViewer = document.getElementById('full-logs-viewer');
+            logViewer.style.display = 'block';
             
-            const oldQty = allTanks[idx].qty;
-            const newQty = Math.min(allTanks[idx].cap, Math.max(0, oldQty + inVal - outVal));
-            const currentTemp = !isNaN(tempVal) ? tempVal : allTanks[idx].temp;
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-LY');
-            const timeStr = now.toLocaleTimeString('ar-LY', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-
-            allTanks[idx].qty = newQty;
-            allTanks[idx].temp = currentTemp;
-
-            push(ref(db, 'logs'), { 
-                time: dateStr + ' ' + timeStr,
-                dateOnly: dateStr,
-                timeOnly: timeStr,
-                tankName: allTanks[idx].name, 
-                added: inVal, 
-                subbed: outVal,
-                tempAtTime: currentTemp,
-                remQty: newQty
+            onValue(ref(db, 'logs'), (snapshot) => {
+                const logs = snapshot.val() ? Object.values(snapshot.val()).reverse() : [];
+                const tbody = document.getElementById('logs-data-body');
+                tbody.innerHTML = logs.map(l => `
+                    <tr>
+                        <td>${l.timestamp}</td>
+                        <td style="color:var(--brega-blue)">${l.tankName}</td>
+                        <td style="color:green">+${l.inward}</td>
+                        <td style="color:red">-${l.outward}</td>
+                        <td style="font-weight:900">${Math.round(l.balance).toLocaleString()} لتر</td>
+                    </tr>
+                `).join('');
             });
+            toggleMainSidebar(false);
+        };
 
-            set(ref(db, 'tanks'), allTanks).then(() => {
-                document.getElementById('inQ').value = '';
-                document.getElementById('outQ').value = '';
-                document.getElementById('tempQ').value = '';
-                closeEdit();
-            });
-        }
-
-        window.clearAllLogs = () => {
-            if (confirm("هل أنت متأكد من حذف السجل بالكامل؟ لا يمكن التراجع.")) {
-                set(ref(db, 'logs'), null).then(() => {
-                    alert("تم حذف السجل بنجاح.");
-                    renderLogs();
-                });
+        window.terminateSession = () => {
+            if(confirm("تأكيد تسجيل الخروج من النظام؟")) {
+                window.location.href = "index.html";
             }
-        }
+        };
+
+        // التشغيل الأولي
+        navigationSwitch('future');
+
     </script>
 </body>
 </html>
