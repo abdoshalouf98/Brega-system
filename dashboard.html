@@ -3,127 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>لوحة التحكم | شركة البريقة</title>
     
     <style>
-        :root { 
-            --primary: #004a99; --bg: #f0f2f5; 
-            --danger: #ef4444; --warning: #f59e0b; --success: #10b981;
-            --metal-dark: #cbd5e1; --metal-light: #f8fafc;
-        }
+        :root { --primary: #004a99; --bg: #f0f2f5; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
-        .header-container {
-            background: white; padding: 50px 5%; text-align: center;
-            border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        
-        .header-logo { width: 200px; height: auto; margin-bottom: 5px; } 
-        .header-title { margin: 5px 0 0 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
+        .header-container { background: white; padding: 50px 5%; text-align: center; border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .header-logo { width: 200px; height: auto; }
+        .menu-btn { position: absolute; right: 30px; top: 30px; background: white; border: 2px solid var(--primary); color: var(--primary); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
 
-        .menu-btn { 
-            position: absolute; right: 30px; top: 20%; transform: translateY(-50%);
-            background: white; border: 2px solid var(--primary); color: var(--primary); 
-            padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: 600;
-        }
-
-        .container { padding: 160px 5% 40px 5%; }
+        .container { padding: 180px 5% 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
-        .tank-card { 
-            background: white; border-radius: 15px; padding: 25px 20px; text-align: center; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
-            border: 1px solid #e2e8f0; position: relative;
-        }
-        
-        .temp-text { font-size: 1rem; color: #475569; font-weight: bold; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; }
+        .tank-card { background: white; border-radius: 15px; padding: 25px 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; border: 1px solid #e2e8f0; position: relative; }
+        .temp-text { font-size: 0.9rem; color: #475569; position: absolute; top: 15px; left: 15px; background: #f1f5f9; padding: 2px 8px; border-radius: 10px; }
         .tank-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 20px; color: #1e293b; }
-
-        .tank-wrapper {
-            width: 130px; height: 170px; margin: 10px auto 25px;
-            position: relative; 
-            background: linear-gradient(90deg, #94a3b8 0%, #f1f5f9 50%, #94a3b8 100%);
-            border: 2px solid #64748b; border-radius: 15px 15px 8px 8px;
-            box-shadow: inset -5px 0 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .tank-wrapper::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; height: 12px;
-            background: #64748b; border-bottom: 2px solid #475569; z-index: 5;
-        }
-
-        .tank-legs {
-            width: 100px; height: 12px; background: #334155; margin: -26px auto 15px;
-            border-radius: 2px; position: relative; z-index: 1;
-        }
-
-        .fuel-fill { 
-            position: absolute; bottom: 0; width: 100%; 
-            transition: height 1s cubic-bezier(0.4, 0, 0.2, 1); 
-            z-index: 2; opacity: 0.9;
-        }
-        
-        .fuel-top { position: absolute; top: 0; width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-top: 2px solid rgba(255,255,255,0.5); }
-
-        .tank-measure {
-            position: absolute; right: 8px; top: 20px; bottom: 10px; width: 10px;
-            border-right: 2px solid rgba(0,0,0,0.1);
-            background: repeating-linear-gradient(0deg, #475569 0px, #475569 1px, transparent 1px, transparent 10px);
-            z-index: 4;
-        }
-
-        .status-danger { background: linear-gradient(180deg, #f87171, #dc2626); }
-        .status-warning { background: linear-gradient(180deg, #fbbf24, #d97706); }
-        .status-success { background: linear-gradient(180deg, #34d399, #059669); }
-
-        .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
-        .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
+        .tank-wrapper { width: 100px; height: 150px; margin: 0 auto 15px; border: 3px solid #64748b; border-radius: 10px; position: relative; overflow: hidden; background: #e2e8f0; }
+        .fuel-fill { position: absolute; bottom: 0; width: 100%; transition: height 1s; }
+        .status-danger { background: #ef4444; } .status-warning { background: #f59e0b; } .status-success { background: #10b981; }
 
         .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .sidebar.active { right: 0; }
+        .nav-content { flex-grow: 1; }
         .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-decoration: none; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
+        .sidebar-footer { border-top: 2px solid #f1f5f9; }
+        .logout-link { color: var(--danger) !important; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; }
         .overlay.active { display: block; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
-        .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; box-sizing: border-box; }
-
-        @media print {
-            @page { size: A4 landscape; margin: 10mm; }
-            body * { visibility: hidden; }
-            #logsModal, #logsModal * { visibility: visible; }
-            #logsModal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; background: white; padding: 0; }
-            #logsModal button, .menu-btn, .filter-section { display: none !important; }
-            .m-box { max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
-            table { width: 100% !important; border-collapse: collapse; margin-top: 10px; font-size: 10pt; }
-            th, td { border: 1px solid #000 !important; padding: 8px; text-align: center; color: black !important; }
-            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
-            .header-container, .sidebar { display: none !important; }
-        }
+        .m-box { background: white; width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
     <header class="header-container">
         <button class="menu-btn" onclick="openNav()">القائمة</button>
-        <img src="Brega.PNG" class="header-logo" onerror="this.src='https://via.placeholder.com/90x90?text=Brega'">
-        <h1 class="header-title">شركة البريقة لتسويق النفط</h1>
+        <img src="Brega.PNG?v=2" class="header-logo">
     </header>
 
     <div class="overlay" id="overlay" onclick="closeNav()"></div>
     
     <div class="sidebar" id="sidebar">
-        <div style="text-align:center; padding:30px; background: #f8fafc;">
-            <img src="Brega.PNG" width="80" onerror="this.src='https://via.placeholder.com/80'">
-            <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
+        <div style="padding: 20px; text-align: center; background: #f8fafc;">
+            <img src="Brega.PNG?v=2" width="60">
+            <div style="font-weight: bold; margin-top: 10px;">نظام المراقبة</div>
         </div>
-        <div class="nav-link" onclick="closeNav()">الرئيسية</div>
-        <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
-        <div class="nav-link" onclick="localStorage.clear(); location.reload();" style="color:var(--danger)">تسجيل الخروج</div>
+        <div class="nav-content">
+            <div class="nav-link" onclick="location.reload(true)">تحديث الصفحة 🔄</div>
+            <div class="nav-link" onclick="closeNav()">الرئيسية</div>
+        </div>
+        <div class="sidebar-footer">
+            <div class="nav-link logout-link" onclick="localStorage.clear(); location.href='index.html'">تسجيل الخروج ⬅️</div>
+        </div>
     </div>
 
     <div class="container">
@@ -132,56 +71,17 @@
 
     <div id="editModal" class="modal">
         <div class="m-box">
-            <h3 style="text-align:center; color:var(--primary); margin-bottom:20px;">تحديث بيانات التشغيل</h3>
-            <label>كمية الشحن (وارد +)</label><input type="number" id="inQ" placeholder="0">
-            <label>كمية الصرف (منصرف -)</label><input type="number" id="outQ" placeholder="0">
-            <label>درجة الحرارة الحالية (C)</label><input type="number" id="tempQ" step="0.1" placeholder="مثلاً 25.5">
-            <button onclick="saveData()" style="background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد العملية</button>
-            <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#64748b; margin-top:15px; cursor:pointer">إلغاء وإغلاق</button>
-        </div>
-    </div>
-
-    <div id="logsModal" class="modal">
-        <div class="m-box" style="max-width: 1100px; height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap: 10px;">
-                <h3 style="margin:0">كشف حركات الخزانات التفصيلي</h3>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="window.print()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">طباعة</button>
-                    <button onclick="window.print()" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حفظ PDF</button>
-                    <button onclick="clearAllLogs()" style="background:var(--danger); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حذف الكل</button>
-                </div>
-            </div>
-
-            <div class="filter-section" style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: bold; color: var(--primary);">عرض حركات خزان محدد:</label>
-                <select id="tankFilter" onchange="renderLogs()" style="margin-bottom: 0; padding: 8px; width: 200px;">
-                    <option value="all">-- كل الخزانات --</option>
-                </select>
-            </div>
-
-            <div style="overflow-y:auto; flex-grow:1;">
-                <table id="logsTable" style="width:100%; border-collapse:collapse; text-align:center;">
-                    <thead style="position:sticky; top:0; background:#f8fafc; z-index:10;">
-                        <tr style="border-bottom:2px solid #e2e8f0;">
-                            <th style="padding:12px;">التاريخ</th>
-                            <th>الساعة</th>
-                            <th>الخزان</th>
-                            <th>الحرارة</th>
-                            <th>الزيادة (+)</th>
-                            <th>النقصان (-)</th>
-                            <th>المخزون المتبقي</th>
-                        </tr>
-                    </thead>
-                    <tbody id="logsBody"></tbody>
-                </table>
-            </div>
-            <button onclick="closeLogs()" style="width:100%; margin-top:20px; padding:12px; background:#f1f5f9; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق السجل</button>
+            <h3>تحديث البيانات</h3>
+            <input type="number" id="inQ" placeholder="وارد +">
+            <input type="number" id="outQ" placeholder="منصرف -">
+            <button onclick="saveData()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px;">حفظ</button>
+            <button onclick="closeEdit()" style="width:100%; background:none; border:none; margin-top:10px; color:gray;">إلغاء</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
@@ -194,122 +94,35 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let allTanks = [];
-        let rawLogs = [];
 
-        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
-        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
-        window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); renderLogs(); }
-        window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
-        window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
-        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
+        window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); };
+        window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); };
+        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; };
 
         onValue(ref(db, 'tanks'), (snap) => {
-            allTanks = snap.val() ? Object.values(snap.val()) : [];
-            const container = document.getElementById('tanksGrid');
-            const filterSelect = document.getElementById('tankFilter');
-            
-            container.innerHTML = '';
-            const currentFilter = filterSelect.value;
-            filterSelect.innerHTML = '<option value="all">-- كل الخزانات --</option>';
-
-            allTanks.forEach(t => {
-                const percent = Math.min(100, Math.max(0, (t.qty / t.cap) * 100));
-                let status = 'status-success';
-                if (percent < 15) status = 'status-danger';
-                else if (percent < 40) status = 'status-warning';
-
-                container.innerHTML += `
-                    <div class="tank-card" onclick="openEdit(${t.id})">
-                        <div class="temp-text">${t.temp} C</div>
+            allTanks = snap.val() || [];
+            const grid = document.getElementById('tanksGrid');
+            grid.innerHTML = '';
+            allTanks.forEach((t, i) => {
+                const p = (t.qty / t.cap) * 100;
+                const status = p < 20 ? 'status-danger' : (p < 50 ? 'status-warning' : 'status-success');
+                grid.innerHTML += `
+                    <div class="tank-card" onclick="window.currIdx=${i}; document.getElementById('editModal').style.display='flex'">
+                        <div class="temp-text">${t.temp}°C</div>
                         <div class="tank-name">${t.name}</div>
-                        <div class="tank-wrapper">
-                            <div class="tank-measure"></div>
-                            <div class="fuel-fill ${status}" style="height:${percent}%">
-                                <div class="fuel-top"></div>
-                            </div>
-                        </div>
-                        <div class="tank-legs"></div>
-                        <div class="qty-val">${Math.round(t.qty).toLocaleString()} L</div>
-                        <div class="percent-label">${percent.toFixed(1)}% ممتلئ</div>
+                        <div class="tank-wrapper"><div class="fuel-fill ${status}" style="height:${p}%"></div></div>
+                        <div style="font-weight:bold">${Math.round(t.qty).toLocaleString()} L</div>
                     </div>`;
-                filterSelect.innerHTML += `<option value="${t.name}">${t.name}</option>`;
             });
-            filterSelect.value = currentFilter;
         });
-
-        onValue(ref(db, 'logs'), (snap) => {
-            rawLogs = snap.val() ? Object.values(snap.val()) : [];
-            renderLogs();
-        });
-
-        window.renderLogs = () => {
-            const filterValue = document.getElementById('tankFilter').value;
-            const tbody = document.getElementById('logsBody');
-            const filtered = rawLogs.filter(l => filterValue === 'all' || l.tankName === filterValue).reverse();
-
-            tbody.innerHTML = filtered.map(l => {
-                const datePart = l.dateOnly || (l.time ? l.time.split(' ')[0] : '-');
-                const timePart = l.timeOnly || (l.time ? l.time.split(' ')[1] : '-');
-                
-                return `
-                <tr style="border-bottom:1px solid #f1f5f9">
-                    <td style="padding:10px;">${datePart}</td>
-                    <td>${timePart}</td>
-                    <td style="font-weight:bold;">${l.tankName || 'غير معروف'}</td>
-                    <td>${l.tempAtTime !== undefined ? l.tempAtTime : '-'} C</td>
-                    <td style="color:var(--success); font-weight:bold;">${l.added > 0 ? '+' + l.added.toLocaleString() : '0'}</td>
-                    <td style="color:var(--danger); font-weight:bold;">${l.subbed > 0 ? '-' + l.subbed.toLocaleString() : '0'}</td>
-                    <td style="background:#f8fafc; font-weight:bold;">${l.remQty !== undefined ? Math.round(l.remQty).toLocaleString() : '-'} L</td>
-                </tr>`;
-            }).join('');
-        }
 
         window.saveData = () => {
-            const idx = allTanks.findIndex(x => x.id === window.currId);
-            const inVal = parseFloat(document.getElementById('inQ').value) || 0;
-            const outVal = parseFloat(document.getElementById('outQ').value) || 0;
-            const tempVal = parseFloat(document.getElementById('tempQ').value);
-            
-            const oldQty = allTanks[idx].qty;
-            const newQty = Math.min(allTanks[idx].cap, Math.max(0, oldQty + inVal - outVal));
-            const currentTemp = !isNaN(tempVal) ? tempVal : allTanks[idx].temp;
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('ar-LY');
-            const timeStr = now.toLocaleTimeString('ar-LY', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-
-            allTanks[idx].qty = newQty;
-            allTanks[idx].temp = currentTemp;
-
-            push(ref(db, 'logs'), { 
-                time: dateStr + ' ' + timeStr,
-                dateOnly: dateStr,
-                timeOnly: timeStr,
-                tankName: allTanks[idx].name, 
-                added: inVal, 
-                subbed: outVal,
-                tempAtTime: currentTemp,
-                remQty: newQty
-            });
-
-            set(ref(db, 'tanks'), allTanks).then(() => {
-                document.getElementById('inQ').value = '';
-                document.getElementById('outQ').value = '';
-                document.getElementById('tempQ').value = '';
-                closeEdit();
-            });
-        }
-
-        window.clearAllLogs = () => {
-            if (confirm("هل أنت متأكد من حذف السجل بالكامل؟ لا يمكن التراجع.")) {
-                if (confirm("سيتم مسح كافة البيانات التاريخية. هل تريد الاستمرار؟")) {
-                    set(ref(db, 'logs'), null).then(() => {
-                        alert("تم حذف السجل بنجاح.");
-                        renderLogs();
-                    });
-                }
-            }
-        }
+            const i = window.currIdx;
+            const inQ = parseFloat(document.getElementById('inQ').value) || 0;
+            const outQ = parseFloat(document.getElementById('outQ').value) || 0;
+            allTanks[i].qty = Math.max(0, Math.min(allTanks[i].cap, allTanks[i].qty + inQ - outQ));
+            set(ref(db, 'tanks'), allTanks).then(closeEdit);
+        };
     </script>
 </body>
 </html>
