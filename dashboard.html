@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>لوحة التحكم | شركة البريقة</title>
     
     <style>
@@ -13,6 +18,7 @@
         }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; direction: rtl; }
         
+        /* الهيدر */
         .header-container {
             background: white; padding: 50px 5%; text-align: center;
             border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -32,6 +38,7 @@
         .container { padding: 160px 5% 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
+        /* كارت الخزان */
         .tank-card { 
             background: white; border-radius: 15px; padding: 25px 20px; text-align: center; 
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
@@ -82,27 +89,32 @@
         .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
         .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
 
+        /* القائمة الجانبية */
         .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .sidebar.active { right: 0; }
         .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; text-decoration: none; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
+        /* النوافذ المنبثقة */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
         .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         input, select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; box-sizing: border-box; }
 
+        /* إعدادات الطباعة */
         @media print {
-            @page { size: A4 landscape; margin: 10mm; }
+            @page { size: A4 landscape; margin: 15mm; }
             body * { visibility: hidden; }
             #logsModal, #logsModal * { visibility: visible; }
-            #logsModal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; background: white; padding: 0; }
-            #logsModal button, .menu-btn, .filter-section { display: none !important; }
-            .m-box { max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
-            table { width: 100% !important; border-collapse: collapse; margin-top: 10px; font-size: 10pt; }
+            #logsModal { position: absolute; left: 0; top: 0; width: 100%; display: block !important; background: white; }
+            #logsModal .m-box { max-width: 100% !important; width: 100% !important; height: auto !important; overflow: visible !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+            .logs-scroll-area { overflow: visible !important; height: auto !important; display: block !important; }
+            #logsModal button, .menu-btn, .filter-section, .header-container, .sidebar, .overlay { display: none !important; }
+            table { width: 100% !important; border-collapse: collapse; margin-top: 10px; font-size: 10pt; page-break-inside: auto; }
+            thead { display: table-header-group; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
             th, td { border: 1px solid #000 !important; padding: 8px; text-align: center; color: black !important; }
             th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
-            .header-container, .sidebar { display: none !important; }
         }
     </style>
 </head>
@@ -110,7 +122,7 @@
 
     <header class="header-container">
         <button class="menu-btn" onclick="openNav()">القائمة</button>
-        <img src="Brega.PNG" class="header-logo" onerror="this.src='https://via.placeholder.com/90x90?text=Brega'">
+        <img src="Brega.PNG" class="header-logo" onerror="this.src='https://via.placeholder.com/200x60?text=Brega+Petroleum'">
         <h1 class="header-title">شركة البريقة لتسويق النفط</h1>
     </header>
 
@@ -121,6 +133,7 @@
             <img src="Brega.PNG" width="80" onerror="this.src='https://via.placeholder.com/80'">
             <div style="font-weight:bold; margin-top:10px; color:var(--primary);">نظام المراقبة الذكي</div>
         </div>
+        <div class="nav-link" onclick="location.reload(true)" style="color:var(--success)">تحديث البيانات 🔄</div>
         <div class="nav-link" onclick="closeNav()">الرئيسية</div>
         <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
         <div class="nav-link" onclick="localStorage.clear(); location.reload();" style="color:var(--danger)">تسجيل الخروج</div>
@@ -146,20 +159,19 @@
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap: 10px;">
                 <h3 style="margin:0">كشف حركات الخزانات التفصيلي</h3>
                 <div style="display:flex; gap:8px;">
-                    <button onclick="window.print()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">طباعة</button>
-                    <button onclick="window.print()" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حفظ PDF</button>
-                    <button onclick="clearAllLogs()" style="background:var(--danger); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حذف الكل</button>
+                    <button onclick="window.print()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">طباعة / PDF</button>
+                    <button onclick="clearAllLogs()" style="background:var(--danger); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">حذف السجل</button>
                 </div>
             </div>
 
             <div class="filter-section" style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <label style="font-weight: bold; color: var(--primary);">عرض حركات خزان محدد:</label>
+                <label style="font-weight: bold; color: var(--primary);">عرض خزان محدد:</label>
                 <select id="tankFilter" onchange="renderLogs()" style="margin-bottom: 0; padding: 8px; width: 200px;">
                     <option value="all">-- كل الخزانات --</option>
                 </select>
             </div>
 
-            <div style="overflow-y:auto; flex-grow:1;">
+            <div class="logs-scroll-area" style="overflow-y:auto; flex-grow:1;">
                 <table id="logsTable" style="width:100%; border-collapse:collapse; text-align:center;">
                     <thead style="position:sticky; top:0; background:#f8fafc; z-index:10;">
                         <tr style="border-bottom:2px solid #e2e8f0;">
@@ -169,7 +181,7 @@
                             <th>الحرارة</th>
                             <th>الزيادة (+)</th>
                             <th>النقصان (-)</th>
-                            <th>المخزون المتبقي</th>
+                            <th>المخزون</th>
                         </tr>
                     </thead>
                     <tbody id="logsBody"></tbody>
@@ -180,9 +192,10 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js?v=1.0";
+        import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js?v=1.0";
 
+        // ملاحظة: يجب تغيير هذا المفتاح كما أخبرتك لأنه مسرب!
         const firebaseConfig = {
             apiKey: "AIzaSyB5_MXeDknEboDv9zV2CQcsQQz-Q1IadcU",
             authDomain: "brega-system.firebaseapp.com",
@@ -301,13 +314,11 @@
         }
 
         window.clearAllLogs = () => {
-            if (confirm("هل أنت متأكد من حذف السجل بالكامل؟ لا يمكن التراجع.")) {
-                if (confirm("سيتم مسح كافة البيانات التاريخية. هل تريد الاستمرار؟")) {
-                    set(ref(db, 'logs'), null).then(() => {
-                        alert("تم حذف السجل بنجاح.");
-                        renderLogs();
-                    });
-                }
+            if (confirm("هل أنت متأكد من حذف السجل بالكامل؟")) {
+                set(ref(db, 'logs'), null).then(() => {
+                    alert("تم حذف السجل.");
+                    renderLogs();
+                });
             }
         }
     </script>
