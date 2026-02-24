@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
     <title>تسجيل الدخول | شركة البريقة</title>
     <style>
         :root { --primary: #004a99; --dark: #002d5d; --bg: #f0f4f8; }
@@ -19,7 +24,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; 
         }
 
-        /* تعديل حجم الصورة لتظهر بشكل متناسق */
         .logo { width: 300px; height: auto; margin-bottom: 25px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
         
         h2 { color: var(--dark); margin-bottom: 35px; font-weight: 800; font-size: 1.6rem; }
@@ -57,7 +61,7 @@
 </head>
 <body>
     <div class="login-card">
-        <img src="Brega.PNG" class="logo" alt="شعار شركة البريقة">
+        <img src="Brega.PNG?v=1.1" class="logo" alt="شعار شركة البريقة" onerror="this.src='https://via.placeholder.com/300x100?text=Brega+Logo'">
         
         <h2>منظومة تتبع الخزانات</h2>
         
@@ -95,7 +99,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.js?v=1.0"></script>
     <script>
         (function(){ emailjs.init("J6WMPCNz4MGxy6WjR"); })();
 
@@ -104,10 +108,10 @@
                   p = document.getElementById('password').value, 
                   e = document.getElementById('errorMessage');
 
-            // الأرقام الوظيفية المسموح لها بالدخول
             if ((u === "40366" && p === "40366") || (u === "36640" && p === "36640")) {
                 localStorage.setItem("currentUser", u); 
-                window.location.href = "dashboard.html";
+                // 4. إضافة نسخة عشوائية عند الانتقال لصفحة الداشبورد لإجبارها على التحديث
+                window.location.href = "dashboard.html?v=" + new Date().getTime();
             } else { 
                 e.style.display = "block"; 
                 e.innerText = "خطأ في بيانات الدخول، يرجى المحاولة مرة أخرى."; 
