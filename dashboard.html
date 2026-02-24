@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم | شركة البريقة</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         :root { 
             --primary: #004a99; --bg: #f0f2f5; 
@@ -18,13 +17,11 @@
         .header-container {
             background: white; padding: 10px 5%; text-align: center;
             border-bottom: 3px solid var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px; /* زيادة الطول لاستيعاب الصورة */
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 130px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         
-        /* تعديل حجم الصورة لتكون متوسطة */
         .header-logo { width: 90px; height: auto; margin-bottom: 5px; } 
-        
         .header-title { margin: 5px 0 0 0; font-size: 1.2rem; color: var(--primary); font-weight: bold; }
 
         .menu-btn { 
@@ -36,7 +33,7 @@
         .container { padding: 160px 5% 40px 5%; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
 
-        /* كرت الخزان الواقعي */
+        /* كرت الخزان */
         .tank-card { 
             background: white; border-radius: 15px; padding: 25px 20px; text-align: center; 
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s;
@@ -72,10 +69,7 @@
             z-index: 2; opacity: 0.9;
         }
         
-        .fuel-top {
-            position: absolute; top: 0; width: 100%; height: 8px;
-            background: rgba(255,255,255,0.3); border-top: 2px solid rgba(255,255,255,0.5);
-        }
+        .fuel-top { position: absolute; top: 0; width: 100%; height: 8px; background: rgba(255,255,255,0.3); border-top: 2px solid rgba(255,255,255,0.5); }
 
         .tank-measure {
             position: absolute; right: 8px; top: 20px; bottom: 10px; width: 10px;
@@ -91,16 +85,29 @@
         .qty-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; margin: 0; }
         .percent-label { font-size: 0.85rem; color: #64748b; font-weight: bold; margin-top: 4px; }
 
+        /* Sidebar & Modals */
         .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .sidebar.active { right: 0; }
         .nav-link { padding: 18px 25px; display: block; color: var(--primary); font-weight: bold; text-align: right; cursor: pointer; border-bottom: 1px solid #f1f5f9; }
-        .logout-btn { color: var(--danger); border-top: 1px solid #eee; margin-top: auto; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1500; backdrop-filter: blur(2px); }
         .overlay.active { display: block; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center; padding: 15px; }
         .m-box { background: white; width: 100%; max-width: 450px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 15px; font-size: 1rem; }
+
+        /* تـنـسـيـق الـطـبـاعـة والـحـفـظ (PDF) */
+        @media print {
+            @page { size: A4; margin: 10mm; }
+            body * { visibility: hidden; }
+            #logsModal, #logsModal * { visibility: visible; }
+            #logsModal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; background: white; }
+            #logsModal button, .menu-btn { display: none !important; }
+            .m-box { max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; }
+            table { width: 100% !important; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #000 !important; padding: 10px; text-align: center; color: black !important; }
+            .header-container, .sidebar { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -120,7 +127,7 @@
         </div>
         <div class="nav-link" onclick="closeNav()">الرئيسية (الخزانات)</div>
         <div class="nav-link" onclick="openLogs()">سجل الحركات</div>
-        <div class="nav-link logout-btn" onclick="logout()">تسجيل الخروج</div>
+        <div class="nav-link" onclick="localStorage.clear(); location.reload();" style="color:var(--danger)">تسجيل الخروج</div>
     </div>
 
     <div class="container">
@@ -133,20 +140,23 @@
             <label>كمية الشحن (وارد +)</label><input type="number" id="inQ" placeholder="0">
             <label>كمية الصرف (منصرف -)</label><input type="number" id="outQ" placeholder="0">
             <label>درجة الحرارة الحالية (°C)</label><input type="number" id="tempQ" step="0.1" placeholder="مثلاً 25.5">
-            <button class="btn-save" onclick="saveData()" style="background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد العملية</button>
+            <button onclick="saveData()" style="background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد العملية</button>
             <button onclick="closeEdit()" style="width:100%; border:none; background:none; color:#64748b; margin-top:15px; cursor:pointer">إلغاء وإغلاق</button>
         </div>
     </div>
 
     <div id="logsModal" class="modal">
         <div class="m-box" style="max-width: 900px; height: 80vh; overflow: hidden; display: flex; flex-direction: column;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap: 10px;">
                 <h3 style="margin:0">سجل حركات الخزانات اليومي</h3>
-                <button onclick="downloadPDF()" style="background:var(--success); color:white; border:none; padding:8px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">تحميل PDF</button>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="window.print()" style="background:var(--primary); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">🖨️ طباعة</button>
+                    <button onclick="window.print()" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; font-size: 0.9rem;">💾 حفظ PDF</button>
+                </div>
             </div>
             <div style="overflow-y:auto; flex-grow:1;">
                 <table id="logsTable" style="width:100%; border-collapse:collapse; text-align:center;">
-                    <thead style="position:sticky; top:0; background:#f8fafc;">
+                    <thead style="position:sticky; top:0; background:#f8fafc; z-index:10;">
                         <tr style="border-bottom:2px solid #e2e8f0;">
                             <th style="padding:12px;">التوقيت</th><th>اسم الخزان</th><th>الوارد</th><th>المنصرف</th>
                         </tr>
@@ -173,24 +183,23 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         let allTanks = [];
-        const user = localStorage.getItem("currentUser") || "Admin";
 
         window.openNav = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').classList.add('active'); }
         window.closeNav = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').classList.remove('active'); }
         window.openLogs = () => { document.getElementById('logsModal').style.display = 'flex'; closeNav(); }
         window.closeLogs = () => { document.getElementById('logsModal').style.display = 'none'; }
+        window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
+        window.closeEdit = () => { document.getElementById('editModal').style.display = 'none'; }
 
         onValue(ref(db, 'tanks'), (snap) => {
-            const data = snap.val();
-            allTanks = data ? Object.values(data) : [];
+            allTanks = snap.val() ? Object.values(snap.val()) : [];
             const container = document.getElementById('tanksGrid');
             container.innerHTML = '';
-
             allTanks.forEach(t => {
                 const percent = Math.min(100, Math.max(0, (t.qty / t.cap) * 100));
-                let statusClass = 'status-success';
-                if (percent < 15) statusClass = 'status-danger';
-                else if (percent < 40) statusClass = 'status-warning';
+                let status = 'status-success';
+                if (percent < 15) status = 'status-danger';
+                else if (percent < 40) status = 'status-warning';
 
                 container.innerHTML += `
                     <div class="tank-card" onclick="openEdit(${t.id})">
@@ -198,7 +207,7 @@
                         <div class="tank-name">${t.name}</div>
                         <div class="tank-wrapper">
                             <div class="tank-measure"></div>
-                            <div class="fuel-fill ${statusClass}" style="height:${percent}%">
+                            <div class="fuel-fill ${status}" style="height:${percent}%">
                                 <div class="fuel-top"></div>
                             </div>
                         </div>
@@ -211,7 +220,7 @@
 
         onValue(ref(db, 'logs'), (snap) => {
             const logs = Object.values(snap.val() || {}).reverse();
-            document.getElementById('logsBody').innerHTML = logs.slice(0, 50).map(l => `
+            document.getElementById('logsBody').innerHTML = logs.map(l => `
                 <tr style="border-bottom:1px solid #f1f5f9">
                     <td style="padding:12px; font-size:0.85rem; color:#64748b;">${l.time}</td>
                     <td style="font-weight:bold;">${l.tankName}</td>
@@ -221,11 +230,6 @@
             `).join('');
         });
 
-        window.openEdit = (id) => { window.currId = id; document.getElementById('editModal').style.display = 'flex'; }
-        window.closeEdit = () => { 
-            document.getElementById('editModal').style.display = 'none';
-        }
-        
         window.saveData = () => {
             const idx = allTanks.findIndex(x => x.id === window.currId);
             const inVal = parseFloat(document.getElementById('inQ').value) || 0;
@@ -233,19 +237,9 @@
             const tempVal = parseFloat(document.getElementById('tempQ').value);
             allTanks[idx].qty = Math.min(allTanks[idx].cap, Math.max(0, allTanks[idx].qty + inVal - outVal));
             if(!isNaN(tempVal)) allTanks[idx].temp = tempVal;
-            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal, user: user });
+            push(ref(db, 'logs'), { time: new Date().toLocaleString('ar-LY'), tankName: allTanks[idx].name, added: inVal, subbed: outVal });
             set(ref(db, 'tanks'), allTanks).then(closeEdit);
         }
-
-        window.downloadPDF = () => { 
-            const { jsPDF } = window.jspdf; 
-            const doc = new jsPDF(); 
-            doc.text("Brega Petroleum - Tanks Report", 14, 15);
-            doc.autoTable({ html: '#logsTable', margin: {top: 25} }); 
-            doc.save('Brega_Report.pdf'); 
-        }
-        
-        window.logout = () => { localStorage.clear(); window.location.replace("index.html"); }
     </script>
 </body>
 </html>
